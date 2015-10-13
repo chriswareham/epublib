@@ -18,7 +18,7 @@ public interface BookProcessor {
     public BookProcessor IDENTITY_BOOKPROCESSOR = new BookProcessor() {
 
         @Override
-        public Book processBook(Book book) {
+        public Book processBook(final Book book) {
             return book;
         }
     };
