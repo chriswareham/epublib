@@ -234,5 +234,4 @@ public abstract class ProxyInputStream extends FilterInputStream {
     protected void handleIOException(IOException e) throws IOException {
         throw e;
     }
-
 }

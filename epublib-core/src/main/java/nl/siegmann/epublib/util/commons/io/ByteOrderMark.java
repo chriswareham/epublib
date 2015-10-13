@@ -166,5 +166,4 @@ public class ByteOrderMark implements Serializable {
         builder.append(']');
         return builder.toString();
     }
-
 }

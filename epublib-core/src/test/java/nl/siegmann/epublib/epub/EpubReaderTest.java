@@ -2,16 +2,18 @@ package nl.siegmann.epublib.epub;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
-import org.junit.Test;
-
 import nl.siegmann.epublib.domain.Book;
 import nl.siegmann.epublib.domain.Resource;
 import nl.siegmann.epublib.service.MediatypeService;
+
+import org.junit.Assert;
+import org.junit.Test;
 
 public class EpubReaderTest {
 
@@ -27,7 +29,7 @@ public class EpubReaderTest {
 		byte[] epubData = out.toByteArray();
 		Book readBook = new EpubReader().readEpub(new ByteArrayInputStream(
 				epubData));
-		assertNotNull(readBook.getCoverImage());
+		Assert.assertNotNull(readBook.getCoverImage());
 	}
 
 	@Test
@@ -45,9 +47,9 @@ public class EpubReaderTest {
 		byte[] epubData = out.toByteArray();
 		Book readBook = new EpubReader().readEpub(new ByteArrayInputStream(
 				epubData));
-		assertNotNull(readBook.getCoverPage());
-		assertEquals(1, readBook.getSpine().size());
-		assertEquals(1, readBook.getTableOfContents().size());
+		Assert.assertNotNull(readBook.getCoverPage());
+		Assert.assertEquals(1, readBook.getSpine().size());
+		Assert.assertEquals(1, readBook.getTableOfContents().size());
 	}
 
 	@Test
@@ -65,12 +67,12 @@ public class EpubReaderTest {
 		byte[] epubData = out.toByteArray();
 		Book readBook = new EpubReader().readEpub(new ByteArrayInputStream(
 				epubData));
-		assertNotNull(readBook.getCoverPage());
-		assertEquals(1, readBook.getSpine().size());
-		assertEquals(1, readBook.getTableOfContents().size());
-		assertNotNull(readBook.getOpfResource());
-		assertNotNull(readBook.getNcxResource());
-		assertEquals(MediatypeService.NCX, readBook.getNcxResource()
+		Assert.assertNotNull(readBook.getCoverPage());
+		Assert.assertEquals(1, readBook.getSpine().size());
+		Assert.assertEquals(1, readBook.getTableOfContents().size());
+		Assert.assertNotNull(readBook.getOpfResource());
+		Assert.assertNotNull(readBook.getNcxResource());
+		Assert.assertEquals(MediatypeService.NCX, readBook.getNcxResource()
 				.getMediaType());
 	}
 }

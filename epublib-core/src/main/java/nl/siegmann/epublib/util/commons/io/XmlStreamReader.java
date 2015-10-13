@@ -33,7 +33,6 @@ import java.text.MessageFormat;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-
 /**
  * Character stream that handles all the necessary Voodo to figure out the
  * charset encoding of the XML document within the stream.
@@ -89,7 +88,6 @@ public class XmlStreamReader extends Reader {
         new ByteOrderMark(UTF_16LE, 0x3C, 0x00, 0x3F, 0x00),
         new ByteOrderMark(EBCDIC,   0x4C, 0x6F, 0xA7, 0x94)
     };
-
 
     private final Reader reader;
 
@@ -537,7 +535,6 @@ public class XmlStreamReader extends Reader {
         throw new XmlStreamReaderException(msg, bomEnc, xmlGuessEnc, xmlEnc);
     }
 
-
     /**
      * Calculate the HTTP encoding.
      *
@@ -707,14 +704,14 @@ public class XmlStreamReader extends Reader {
 
     /**
      * Indicates if the MIME type belongs to the APPLICATION XML family.
-     * 
+     *
      * @param mime The mime type
      * @return true if the mime type belongs to the APPLICATION XML family,
      * otherwise false
      */
     static boolean isAppXml(String mime) {
         return mime != null &&
-               (mime.equals("application/xml") || 
+               (mime.equals("application/xml") ||
                 mime.equals("application/xml-dtd") ||
                 mime.equals("application/xml-external-parsed-entity") ||
                (mime.startsWith("application/") && mime.endsWith("+xml")));
@@ -722,7 +719,7 @@ public class XmlStreamReader extends Reader {
 
     /**
      * Indicates if the MIME type belongs to the TEXT XML family.
-     * 
+     *
      * @param mime The mime type
      * @return true if the mime type belongs to the TEXT XML family,
      * otherwise false
@@ -748,5 +745,4 @@ public class XmlStreamReader extends Reader {
 
     private static final String HTTP_EX_3 =
         "Invalid encoding, CT-MIME [{0}] CT-Enc [{1}] BOM [{2}] XML guess [{3}] XML prolog [{4}], Invalid MIME";
-
 }

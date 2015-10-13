@@ -8,25 +8,26 @@ import java.io.OutputStream;
  * We write multiple documents to a ZipOutputStream.
  * Some of the formatters call a close() after writing their data.
  * We don't want them to do that, so we wrap regular OutputStreams in this NoCloseOutputStream.
- * 
+ *
  * @author paul
  *
  */public class NoCloseOutputStream extends OutputStream {
 
-	private OutputStream outputStream;
-	
-	public NoCloseOutputStream(OutputStream outputStream) {
-		this.outputStream = outputStream;
-	}
-	
-	@Override
-	public void write(int b) throws IOException {
-		outputStream.write(b);
-	}
+    private final OutputStream outputStream;
 
-	/**
-	 * A close() that does not call it's parent's close()
-	 */
-	public void close() {
-	}
+    public NoCloseOutputStream(final OutputStream outputStream) {
+        this.outputStream = outputStream;
+    }
+
+    @Override
+    public void write(int b) throws IOException {
+        outputStream.write(b);
+    }
+
+    /**
+     * A close() that does not call it's parent's close()
+     */
+    @Override
+    public void close() {
+    }
 }
