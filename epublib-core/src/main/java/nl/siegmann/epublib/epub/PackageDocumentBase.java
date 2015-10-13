@@ -6,72 +6,73 @@ package nl.siegmann.epublib.epub;
  * @author paul
  */
 public interface PackageDocumentBase {
-    String BOOK_ID_ID = "BookId";
+    String BOOK_ID = "BookId";
     String NAMESPACE_OPF = "http://www.idpf.org/2007/opf";
     String NAMESPACE_DUBLIN_CORE = "http://purl.org/dc/elements/1.1/";
     String PREFIX_DUBLIN_CORE = "dc";
     String PREFIX_OPF = "opf";
-    String dateFormat = "yyyy-MM-dd";
+    String PREFIX_EMPTY = "";
+    String DATE_FORMAT = "yyyy-MM-dd";
 
     public interface DCElements {
-        String title = "title";
-        String creator = "creator";
-        String subject = "subject";
-        String description = "description";
-        String publisher = "publisher";
-        String contributor = "contributor";
-        String date = "date";
-        String type = "type";
-        String format = "format";
-        String identifier = "identifier";
-        String source = "source";
-        String language = "language";
-        String relation = "relation";
-        String coverage = "coverage";
-        String rights = "rights";
+        String TITLE = "title";
+        String CREATOR = "creator";
+        String SUBJECT = "subject";
+        String DESCRIPTION = "description";
+        String PUBLISHER = "publisher";
+        String CONTRIBUTOR = "contributor";
+        String DATE = "date";
+        String TYPE = "type";
+        String FORMAT = "format";
+        String IDENTIFIER = "identifier";
+        String SOURCE = "source";
+        String LANGUAGE = "language";
+        String RELATION = "relation";
+        String COVERAGE = "coverage";
+        String RIGHTS = "rights";
     }
 
     public interface DCAttributes {
-        String scheme = "scheme";
-        String id = "id";
+        String SCHEME = "scheme";
+        String ID = "id";
     }
 
     public interface OPFElements {
-        String metadata = "metadata";
-        String meta = "meta";
-        String manifest = "manifest";
-        String packageTag = "package";
-        String itemref = "itemref";
-        String spine = "spine";
-        String reference = "reference";
-        String guide = "guide";
-        String item = "item";
+        String METADATA = "metadata";
+        String META = "meta";
+        String MANIFEST = "manifest";
+        String PACKAGE = "package";
+        String ITEMREF = "itemref";
+        String SPINE = "spine";
+        String REFERENCE = "reference";
+        String GUIDE = "guide";
+        String ITEM = "item";
     }
 
     public interface OPFAttributes {
-        String uniqueIdentifier = "unique-identifier";
-        String idref = "idref";
-        String name = "name";
-        String content = "content";
-        String type = "type";
-        String href = "href";
-        String linear = "linear";
-        String event = "event";
-        String role = "role";
-        String file_as = "file-as";
-        String id = "id";
-        String media_type = "media-type";
-        String title = "title";
-        String toc = "toc";
-        String version = "version";
-        String scheme = "scheme";
-        String property = "property";
+        String UNIQUE_IDENTIFIER = "unique-identifier";
+        String IDREF = "idref";
+        String NAME = "name";
+        String CONTENT = "content";
+        String TYPE = "type";
+        String HREF = "href";
+        String LINEAR = "linear";
+        String EVENT = "event";
+        String ROLE = "role";
+        String FILE_AS = "file-as";
+        String ID = "id";
+        String MEDIA_TYPE = "media-type";
+        String TITLE = "title";
+        String TOC = "toc";
+        String VERSION = "version";
+        String SCHEME = "scheme";
+        String PROPERTY = "property";
     }
 
     public interface OPFValues {
-        String meta_cover = "cover";
-        String reference_cover = "cover";
-        String no = "no";
-        String generator = "generator";
+        String META_COVER = "cover";
+        String REFERENCE_COVER = "cover";
+        String NO = "no";
+        String GENERATOR = "generator";
     }
 }

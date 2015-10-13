@@ -26,23 +26,20 @@ import org.xmlpull.v1.XmlSerializer;
  */
 public class EpubWriter {
 
-    private final static Logger log = LoggerFactory.getLogger(EpubWriter.class);
+    private final static Logger LOGGER = LoggerFactory.getLogger(EpubWriter.class);
 
-    // package
-    static final String EMPTY_NAMESPACE_PREFIX = "";
-
-    private BookProcessor bookProcessor = BookProcessor.IDENTITY_BOOKPROCESSOR;
+    private BookProcessor bookProcessor;
 
     public EpubWriter() {
         this(BookProcessor.IDENTITY_BOOKPROCESSOR);
     }
 
-    public EpubWriter(BookProcessor bookProcessor) {
+    public EpubWriter(final BookProcessor bookProcessor) {
         this.bookProcessor = bookProcessor;
     }
 
     public void write(Book book, OutputStream out) throws IOException {
-        book = processBook(book);
+        book = preProcessBook(book);
         ZipOutputStream resultStream = new ZipOutputStream(out);
         writeMimeType(resultStream);
         writeContainer(resultStream);
@@ -52,11 +49,8 @@ public class EpubWriter {
         resultStream.close();
     }
 
-    private Book processBook(Book book) {
-        if (bookProcessor != null) {
-            book = bookProcessor.processBook(book);
-        }
-        return book;
+    private Book preProcessBook(final Book book) {
+        return bookProcessor != null ? bookProcessor.processBook(book) : book;
     }
 
     private void initTOCResource(Book book) {
@@ -70,12 +64,12 @@ public class EpubWriter {
             book.getSpine().setTocResource(tocResource);
             book.getResources().add(tocResource);
         } catch (Exception e) {
-            log.error("Error writing table of contents: " + e.getClass().getName() + ": " + e.getMessage());
+            LOGGER.error("Error writing table of contents: " + e.getClass().getName() + ": " + e.getMessage());
         }
     }
 
     private void writeResources(Book book, ZipOutputStream resultStream) throws IOException {
-        for(Resource resource: book.getResources().getAll()) {
+        for (Resource resource: book.getResources().getAll()) {
             writeResource(resource, resultStream);
         }
     }
@@ -87,8 +81,7 @@ public class EpubWriter {
      * @param resultStream
      * @throws IOException
      */
-    private void writeResource(Resource resource, ZipOutputStream resultStream)
-            throws IOException {
+    private void writeResource(Resource resource, ZipOutputStream resultStream) throws IOException {
         if(resource == null) {
             return;
         }
@@ -98,7 +91,7 @@ public class EpubWriter {
             IOUtil.copy(inputStream, resultStream);
             inputStream.close();
         } catch(Exception e) {
-            log.error(e.getMessage(), e);
+            LOGGER.error(e.getMessage(), e);
         }
     }
 
@@ -170,5 +163,4 @@ public class EpubWriter {
     public void setBookProcessor(BookProcessor bookProcessor) {
         this.bookProcessor = bookProcessor;
     }
-
 }

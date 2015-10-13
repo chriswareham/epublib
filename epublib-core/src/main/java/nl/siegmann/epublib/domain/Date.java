@@ -56,7 +56,7 @@ public class Date implements Serializable {
     }
 
     public Date(java.util.Date date, Event event) {
-        this((new SimpleDateFormat(PackageDocumentBase.dateFormat)).format(date), event);
+        this((new SimpleDateFormat(PackageDocumentBase.DATE_FORMAT)).format(date), event);
     }
 
     public Date(String dateString, Event event) {
@@ -65,7 +65,7 @@ public class Date implements Serializable {
     }
 
     public Date(java.util.Date date, String event) {
-        this((new SimpleDateFormat(PackageDocumentBase.dateFormat)).format(date), event);
+        this((new SimpleDateFormat(PackageDocumentBase.DATE_FORMAT)).format(date), event);
     }
 
     public Date(String dateString, String event) {

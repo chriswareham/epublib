@@ -29,8 +29,17 @@ import org.w3c.dom.Element;
  */
 public class EpubReader {
 
-    private static final Logger log = LoggerFactory.getLogger(EpubReader.class);
-    private BookProcessor bookProcessor = BookProcessor.IDENTITY_BOOKPROCESSOR;
+    private final static Logger LOGGER = LoggerFactory.getLogger(EpubReader.class);
+
+    private BookProcessor bookProcessor;
+
+    public EpubReader() {
+        this(BookProcessor.IDENTITY_BOOKPROCESSOR);
+    }
+
+    public EpubReader(final BookProcessor bookProcessor) {
+        this.bookProcessor = bookProcessor;
+    }
 
     public Book readEpub(InputStream in) throws IOException {
         return readEpub(in, Constants.CHARACTER_ENCODING);
@@ -96,24 +105,17 @@ public class EpubReader {
     }
 
     public Book readEpub(Resources resources, Book result) throws IOException{
-        if (result == null) {
-            result = new Book();
-        }
         handleMimeType(result, resources);
         String packageResourceHref = getPackageResourceHref(resources);
         Resource packageResource = processPackageResource(packageResourceHref, result, resources);
         result.setOpfResource(packageResource);
         Resource ncxResource = processNcxResource(packageResource, result);
         result.setNcxResource(ncxResource);
-        result = postProcessBook(result);
-        return result;
+        return postProcessBook(result);
     }
 
-    private Book postProcessBook(Book book) {
-        if (bookProcessor != null) {
-            book = bookProcessor.processBook(book);
-        }
-        return book;
+    private Book postProcessBook(final Book book) {
+        return bookProcessor != null ? bookProcessor.processBook(book) : book;
     }
 
     private Resource processNcxResource(Resource packageResource, Book book) {
@@ -125,7 +127,7 @@ public class EpubReader {
         try {
             PackageDocumentReader.read(packageResource, this, book, resources);
         } catch (Exception e) {
-            log.error(e.getMessage(), e);
+            LOGGER.error(e.getMessage(), e);
         }
         return packageResource;
     }
@@ -143,7 +145,7 @@ public class EpubReader {
             Element rootFileElement = (Element) ((Element) document.getDocumentElement().getElementsByTagName("rootfiles").item(0)).getElementsByTagName("rootfile").item(0);
             result = rootFileElement.getAttribute("full-path");
         } catch (Exception e) {
-            log.error(e.getMessage(), e);
+            LOGGER.error(e.getMessage(), e);
         }
         if(StringUtil.isBlank(result)) {
             result = defaultResult;

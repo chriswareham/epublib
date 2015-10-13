@@ -34,24 +34,24 @@ public class PackageDocumentMetadataReader implements PackageDocumentBase {
 
     public static Metadata readMetadata(Document packageDocument) {
         Metadata result = new Metadata();
-        Element metadataElement = DOMUtil.getFirstElementByTagNameNS(packageDocument.getDocumentElement(), NAMESPACE_OPF, OPFElements.metadata);
+        Element metadataElement = DOMUtil.getFirstElementByTagNameNS(packageDocument.getDocumentElement(), NAMESPACE_OPF, OPFElements.METADATA);
         if(metadataElement == null) {
-            log.error("Package does not contain element " + OPFElements.metadata);
+            log.error("Package does not contain element " + OPFElements.METADATA);
             return result;
         }
-        result.setTitles(DOMUtil.getElementsTextChild(metadataElement, NAMESPACE_DUBLIN_CORE, DCElements.title));
-        result.setPublishers(DOMUtil.getElementsTextChild(metadataElement, NAMESPACE_DUBLIN_CORE, DCElements.publisher));
-        result.setDescriptions(DOMUtil.getElementsTextChild(metadataElement, NAMESPACE_DUBLIN_CORE, DCElements.description));
-        result.setRights(DOMUtil.getElementsTextChild(metadataElement, NAMESPACE_DUBLIN_CORE, DCElements.rights));
-        result.setTypes(DOMUtil.getElementsTextChild(metadataElement, NAMESPACE_DUBLIN_CORE, DCElements.type));
-        result.setSubjects(DOMUtil.getElementsTextChild(metadataElement, NAMESPACE_DUBLIN_CORE, DCElements.subject));
+        result.setTitles(DOMUtil.getElementsTextChild(metadataElement, NAMESPACE_DUBLIN_CORE, DCElements.TITLE));
+        result.setPublishers(DOMUtil.getElementsTextChild(metadataElement, NAMESPACE_DUBLIN_CORE, DCElements.PUBLISHER));
+        result.setDescriptions(DOMUtil.getElementsTextChild(metadataElement, NAMESPACE_DUBLIN_CORE, DCElements.DESCRIPTION));
+        result.setRights(DOMUtil.getElementsTextChild(metadataElement, NAMESPACE_DUBLIN_CORE, DCElements.RIGHTS));
+        result.setTypes(DOMUtil.getElementsTextChild(metadataElement, NAMESPACE_DUBLIN_CORE, DCElements.TYPE));
+        result.setSubjects(DOMUtil.getElementsTextChild(metadataElement, NAMESPACE_DUBLIN_CORE, DCElements.SUBJECT));
         result.setIdentifiers(readIdentifiers(metadataElement));
         result.setAuthors(readCreators(metadataElement));
         result.setContributors(readContributors(metadataElement));
         result.setDates(readDates(metadataElement));
         result.setOtherProperties(readOtherProperties(metadataElement));
         result.setMetaAttributes(readMetaProperties(metadataElement));
-        Element languageTag = DOMUtil.getFirstElementByTagNameNS(metadataElement, NAMESPACE_DUBLIN_CORE, DCElements.language);
+        Element languageTag = DOMUtil.getFirstElementByTagNameNS(metadataElement, NAMESPACE_DUBLIN_CORE, DCElements.LANGUAGE);
         if (languageTag != null) {
             result.setLanguage(DOMUtil.getTextChildrenContent(languageTag));
         }
@@ -68,10 +68,10 @@ public class PackageDocumentMetadataReader implements PackageDocumentBase {
     private static Map<QName, String> readOtherProperties(Element metadataElement) {
         Map<QName, String> result = new HashMap<QName, String>();
 
-        NodeList metaTags = metadataElement.getElementsByTagNameNS(NAMESPACE_OPF, OPFElements.meta);
+        NodeList metaTags = metadataElement.getElementsByTagNameNS(NAMESPACE_OPF, OPFElements.META);
         for (int i = 0; i < metaTags.getLength(); i++) {
             Node metaNode = metaTags.item(i);
-            Node property = metaNode.getAttributes().getNamedItem(OPFAttributes.property);
+            Node property = metaNode.getAttributes().getNamedItem(OPFAttributes.PROPERTY);
             if (property != null) {
                 String name = property.getNodeValue();
                 String value = metaNode.getTextContent();
@@ -91,11 +91,11 @@ public class PackageDocumentMetadataReader implements PackageDocumentBase {
     private static Map<String, String> readMetaProperties(Element metadataElement) {
         Map<String, String> result = new HashMap<String, String>();
 
-        NodeList metaTags = metadataElement.getElementsByTagName(OPFElements.meta);
+        NodeList metaTags = metadataElement.getElementsByTagName(OPFElements.META);
         for (int i = 0; i < metaTags.getLength(); i++) {
             Element metaElement = (Element) metaTags.item(i);
-            String name = metaElement.getAttribute(OPFAttributes.name);
-            String value = metaElement.getAttribute(OPFAttributes.content);
+            String name = metaElement.getAttribute(OPFAttributes.NAME);
+            String value = metaElement.getAttribute(OPFAttributes.CONTENT);
             result.put(name,  value);
         }
 
@@ -103,20 +103,20 @@ public class PackageDocumentMetadataReader implements PackageDocumentBase {
     }
 
     private static String getBookIdId(Document document) {
-        Element packageElement = DOMUtil.getFirstElementByTagNameNS(document.getDocumentElement(), NAMESPACE_OPF, OPFElements.packageTag);
+        Element packageElement = DOMUtil.getFirstElementByTagNameNS(document.getDocumentElement(), NAMESPACE_OPF, OPFElements.PACKAGE);
         if(packageElement == null) {
             return null;
         }
-        String result = packageElement.getAttributeNS(NAMESPACE_OPF, OPFAttributes.uniqueIdentifier);
+        String result = packageElement.getAttributeNS(NAMESPACE_OPF, OPFAttributes.UNIQUE_IDENTIFIER);
         return result;
     }
 
     private static List<Author> readCreators(Element metadataElement) {
-        return readAuthors(DCElements.creator, metadataElement);
+        return readAuthors(DCElements.CREATOR, metadataElement);
     }
 
     private static List<Author> readContributors(Element metadataElement) {
-        return readAuthors(DCElements.contributor, metadataElement);
+        return readAuthors(DCElements.CONTRIBUTOR, metadataElement);
     }
 
     private static List<Author> readAuthors(String authorTag, Element metadataElement) {
@@ -134,13 +134,13 @@ public class PackageDocumentMetadataReader implements PackageDocumentBase {
     }
 
     private static List<Date> readDates(Element metadataElement) {
-        NodeList elements = metadataElement.getElementsByTagNameNS(NAMESPACE_DUBLIN_CORE, DCElements.date);
+        NodeList elements = metadataElement.getElementsByTagNameNS(NAMESPACE_DUBLIN_CORE, DCElements.DATE);
         List<Date> result = new ArrayList<Date>(elements.getLength());
         for(int i = 0; i < elements.getLength(); i++) {
             Element dateElement = (Element) elements.item(i);
             Date date;
             try {
-                date = new Date(DOMUtil.getTextChildrenContent(dateElement), dateElement.getAttributeNS(NAMESPACE_OPF, OPFAttributes.event));
+                date = new Date(DOMUtil.getTextChildrenContent(dateElement), dateElement.getAttributeNS(NAMESPACE_OPF, OPFAttributes.EVENT));
                 result.add(date);
             } catch(IllegalArgumentException e) {
                 log.error(e.getMessage());
@@ -162,21 +162,21 @@ public class PackageDocumentMetadataReader implements PackageDocumentBase {
         } else {
             result = new Author(authorString.substring(0, spacePos), authorString.substring(spacePos + 1));
         }
-        result.setRole(authorElement.getAttributeNS(NAMESPACE_OPF, OPFAttributes.role));
+        result.setRole(authorElement.getAttributeNS(NAMESPACE_OPF, OPFAttributes.ROLE));
         return result;
     }
 
     private static List<Identifier> readIdentifiers(Element metadataElement) {
-        NodeList identifierElements = metadataElement.getElementsByTagNameNS(NAMESPACE_DUBLIN_CORE, DCElements.identifier);
+        NodeList identifierElements = metadataElement.getElementsByTagNameNS(NAMESPACE_DUBLIN_CORE, DCElements.IDENTIFIER);
         if(identifierElements.getLength() == 0) {
-            log.error("Package does not contain element " + DCElements.identifier);
+            log.error("Package does not contain element " + DCElements.IDENTIFIER);
             return new ArrayList<Identifier>();
         }
         String bookIdId = getBookIdId(metadataElement.getOwnerDocument());
         List<Identifier> result = new ArrayList<Identifier>(identifierElements.getLength());
         for(int i = 0; i < identifierElements.getLength(); i++) {
             Element identifierElement = (Element) identifierElements.item(i);
-            String schemeName = identifierElement.getAttributeNS(NAMESPACE_OPF, DCAttributes.scheme);
+            String schemeName = identifierElement.getAttributeNS(NAMESPACE_OPF, DCAttributes.SCHEME);
             String identifierValue = DOMUtil.getTextChildrenContent(identifierElement);
             if (StringUtil.isBlank(identifierValue)) {
                 continue;
