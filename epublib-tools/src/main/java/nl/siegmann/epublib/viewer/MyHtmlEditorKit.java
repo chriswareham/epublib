@@ -24,133 +24,133 @@ import javax.swing.text.html.HTMLEditorKit.Parser;
 
 /**
  * Wraps a HTMLEditorKit so we can make getParser() public.
- * 
+ *
  * @author paul.siegmann
  *
  */
 class MyHtmlEditorKit extends HTMLEditorKit {
-	private HTMLEditorKit htmlEditorKit;
+    private HTMLEditorKit htmlEditorKit;
 
-	public MyHtmlEditorKit(HTMLEditorKit htmlEditorKit) {
-		this.htmlEditorKit = htmlEditorKit;
-	}
-	
-	public Parser getParser() {
-		return super.getParser();
-	}
-	public int hashCode() {
-		return htmlEditorKit.hashCode();
-	}
+    public MyHtmlEditorKit(HTMLEditorKit htmlEditorKit) {
+        this.htmlEditorKit = htmlEditorKit;
+    }
 
-	public Element getCharacterAttributeRun() {
-		return htmlEditorKit.getCharacterAttributeRun();
-	}
+    public Parser getParser() {
+        return super.getParser();
+    }
+    public int hashCode() {
+        return htmlEditorKit.hashCode();
+    }
 
-	public Caret createCaret() {
-		return htmlEditorKit.createCaret();
-	}
+    public Element getCharacterAttributeRun() {
+        return htmlEditorKit.getCharacterAttributeRun();
+    }
 
-	public void read(InputStream in, Document doc, int pos)
-			throws IOException, BadLocationException {
-		htmlEditorKit.read(in, doc, pos);
-	}
+    public Caret createCaret() {
+        return htmlEditorKit.createCaret();
+    }
 
-	public boolean equals(Object obj) {
-		return htmlEditorKit.equals(obj);
-	}
+    public void read(InputStream in, Document doc, int pos)
+            throws IOException, BadLocationException {
+        htmlEditorKit.read(in, doc, pos);
+    }
 
-	public void write(OutputStream out, Document doc, int pos, int len)
-			throws IOException, BadLocationException {
-		htmlEditorKit.write(out, doc, pos, len);
-	}
+    public boolean equals(Object obj) {
+        return htmlEditorKit.equals(obj);
+    }
 
-	public String getContentType() {
-		return htmlEditorKit.getContentType();
-	}
+    public void write(OutputStream out, Document doc, int pos, int len)
+            throws IOException, BadLocationException {
+        htmlEditorKit.write(out, doc, pos, len);
+    }
 
-	public ViewFactory getViewFactory() {
-		return htmlEditorKit.getViewFactory();
-	}
+    public String getContentType() {
+        return htmlEditorKit.getContentType();
+    }
 
-	public Document createDefaultDocument() {
-		return htmlEditorKit.createDefaultDocument();
-	}
+    public ViewFactory getViewFactory() {
+        return htmlEditorKit.getViewFactory();
+    }
 
-	public void read(Reader in, Document doc, int pos) throws IOException,
-			BadLocationException {
-		htmlEditorKit.read(in, doc, pos);
-	}
+    public Document createDefaultDocument() {
+        return htmlEditorKit.createDefaultDocument();
+    }
 
-	public void insertHTML(HTMLDocument doc, int offset, String html,
-			int popDepth, int pushDepth, Tag insertTag)
-			throws BadLocationException, IOException {
-		htmlEditorKit.insertHTML(doc, offset, html, popDepth, pushDepth,
-				insertTag);
-	}
+    public void read(Reader in, Document doc, int pos) throws IOException,
+            BadLocationException {
+        htmlEditorKit.read(in, doc, pos);
+    }
 
-	public String toString() {
-		return htmlEditorKit.toString();
-	}
+    public void insertHTML(HTMLDocument doc, int offset, String html,
+            int popDepth, int pushDepth, Tag insertTag)
+            throws BadLocationException, IOException {
+        htmlEditorKit.insertHTML(doc, offset, html, popDepth, pushDepth,
+                insertTag);
+    }
 
-	public void write(Writer out, Document doc, int pos, int len)
-			throws IOException, BadLocationException {
-		htmlEditorKit.write(out, doc, pos, len);
-	}
+    public String toString() {
+        return htmlEditorKit.toString();
+    }
 
-	public void install(JEditorPane c) {
-		htmlEditorKit.install(c);
-	}
+    public void write(Writer out, Document doc, int pos, int len)
+            throws IOException, BadLocationException {
+        htmlEditorKit.write(out, doc, pos, len);
+    }
 
-	public void deinstall(JEditorPane c) {
-		htmlEditorKit.deinstall(c);
-	}
+    public void install(JEditorPane c) {
+        htmlEditorKit.install(c);
+    }
 
-	public void setStyleSheet(StyleSheet s) {
-		htmlEditorKit.setStyleSheet(s);
-	}
+    public void deinstall(JEditorPane c) {
+        htmlEditorKit.deinstall(c);
+    }
 
-	public StyleSheet getStyleSheet() {
-		return htmlEditorKit.getStyleSheet();
-	}
+    public void setStyleSheet(StyleSheet s) {
+        htmlEditorKit.setStyleSheet(s);
+    }
 
-	public Action[] getActions() {
-		return htmlEditorKit.getActions();
-	}
+    public StyleSheet getStyleSheet() {
+        return htmlEditorKit.getStyleSheet();
+    }
 
-	public MutableAttributeSet getInputAttributes() {
-		return htmlEditorKit.getInputAttributes();
-	}
+    public Action[] getActions() {
+        return htmlEditorKit.getActions();
+    }
 
-	public void setDefaultCursor(Cursor cursor) {
-		htmlEditorKit.setDefaultCursor(cursor);
-	}
+    public MutableAttributeSet getInputAttributes() {
+        return htmlEditorKit.getInputAttributes();
+    }
 
-	public Cursor getDefaultCursor() {
-		return htmlEditorKit.getDefaultCursor();
-	}
+    public void setDefaultCursor(Cursor cursor) {
+        htmlEditorKit.setDefaultCursor(cursor);
+    }
 
-	public void setLinkCursor(Cursor cursor) {
-		htmlEditorKit.setLinkCursor(cursor);
-	}
+    public Cursor getDefaultCursor() {
+        return htmlEditorKit.getDefaultCursor();
+    }
 
-	public Cursor getLinkCursor() {
-		return htmlEditorKit.getLinkCursor();
-	}
+    public void setLinkCursor(Cursor cursor) {
+        htmlEditorKit.setLinkCursor(cursor);
+    }
 
-	public boolean isAutoFormSubmission() {
-		return htmlEditorKit.isAutoFormSubmission();
-	}
+    public Cursor getLinkCursor() {
+        return htmlEditorKit.getLinkCursor();
+    }
 
-	public void setAutoFormSubmission(boolean isAuto) {
-		htmlEditorKit.setAutoFormSubmission(isAuto);
-	}
+    public boolean isAutoFormSubmission() {
+        return htmlEditorKit.isAutoFormSubmission();
+    }
 
-	public Object clone() {
-		return htmlEditorKit.clone();
-	}
+    public void setAutoFormSubmission(boolean isAuto) {
+        htmlEditorKit.setAutoFormSubmission(isAuto);
+    }
 
-	public AccessibleContext getAccessibleContext() {
-		return htmlEditorKit.getAccessibleContext();
-	}
-	
+    public Object clone() {
+        return htmlEditorKit.clone();
+    }
+
+    public AccessibleContext getAccessibleContext() {
+        return htmlEditorKit.getAccessibleContext();
+    }
+
 }

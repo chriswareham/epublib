@@ -31,149 +31,145 @@ import org.w3c.dom.NodeList;
 /**
  * If the book contains a cover image then this will add a cover page to the book.
  * If the book contains a cover html page it will set that page's first image as the book's cover image.
- * 
+ *
  * FIXME:
  *  will overwrite any "cover.jpg" or "cover.html" that are already there.
- *  
+ *
  * @author paul
  *
  */
 public class CoverpageBookProcessor implements BookProcessor {
 
-	public static int MAX_COVER_IMAGE_SIZE = 999;
-	private static final Logger log = LoggerFactory.getLogger(CoverpageBookProcessor.class);
-	public static final String DEFAULT_COVER_PAGE_ID = "cover";
-	public static final String DEFAULT_COVER_PAGE_HREF = "cover.html";
-	public static final String DEFAULT_COVER_IMAGE_ID = "cover-image";
-	public static final String DEFAULT_COVER_IMAGE_HREF = "images/cover.png";
-	
-	@Override
-	public Book processBook(Book book) {
-		Metadata metadata = book.getMetadata();
-		if(book.getCoverPage() == null && book.getCoverImage() == null) {
-			return book;
-		}
-		Resource coverPage = book.getCoverPage();
-		if (coverPage == null) {
-			coverPage = findCoverPage(book);
-			book.setCoverPage(coverPage);
-		}
-		Resource coverImage = book.getCoverImage();
-		if(coverPage == null) {
-			if(coverImage == null) {
-				// give up
-			} else { // coverImage != null
-				if(StringUtils.isBlank(coverImage.getHref())) {
-					coverImage.setHref(getCoverImageHref(coverImage, book));
-				}
-				String coverPageHtml = createCoverpageHtml(CollectionUtil.first(metadata.getTitles()), coverImage.getHref());
-				coverPage = new Resource(null, coverPageHtml.getBytes(), getCoverPageHref(book), MediatypeService.XHTML);
-				fixCoverResourceId(book, coverPage, DEFAULT_COVER_PAGE_ID);
-			}
-		} else { // coverPage != null
-			if(book.getCoverImage() == null) {
-				coverImage = getFirstImageSource(coverPage, book.getResources());
-				book.setCoverImage(coverImage);
-				if (coverImage != null) {
-					book.getResources().remove(coverImage.getHref());
-				}
-			} else { // coverImage != null
-				
-			}
-		}
-		
-		book.setCoverImage(coverImage);
-		book.setCoverPage(coverPage);
-		setCoverResourceIds(book);
-		return book;
-	}
+    public static int MAX_COVER_IMAGE_SIZE = 999;
+    private static final Logger log = LoggerFactory.getLogger(CoverpageBookProcessor.class);
+    public static final String DEFAULT_COVER_PAGE_ID = "cover";
+    public static final String DEFAULT_COVER_PAGE_HREF = "cover.html";
+    public static final String DEFAULT_COVER_IMAGE_ID = "cover-image";
+    public static final String DEFAULT_COVER_IMAGE_HREF = "images/cover.png";
 
-//	private String getCoverImageHref(Resource coverImageResource) {
-//		return "cover" + coverImageResource.getMediaType().getDefaultExtension();
-//	}
-	
-	private Resource findCoverPage(Book book) {
-		if (book.getCoverPage() != null) {
-			return book.getCoverPage();
-		}
-		if (! (book.getSpine().isEmpty())) {
-			return book.getSpine().getResource(0);
-		}
-		return null;
-	}
+    @Override
+    public Book processBook(Book book) {
+        Metadata metadata = book.getMetadata();
+        if(book.getCoverPage() == null && book.getCoverImage() == null) {
+            return book;
+        }
+        Resource coverPage = book.getCoverPage();
+        if (coverPage == null) {
+            coverPage = findCoverPage(book);
+            book.setCoverPage(coverPage);
+        }
+        Resource coverImage = book.getCoverImage();
+        if(coverPage == null) {
+            if(coverImage == null) {
+                // give up
+            } else { // coverImage != null
+                if(StringUtils.isBlank(coverImage.getHref())) {
+                    coverImage.setHref(getCoverImageHref(coverImage, book));
+                }
+                String coverPageHtml = createCoverpageHtml(CollectionUtil.first(metadata.getTitles()), coverImage.getHref());
+                coverPage = new Resource(null, coverPageHtml.getBytes(), getCoverPageHref(book), MediatypeService.XHTML);
+                fixCoverResourceId(book, coverPage, DEFAULT_COVER_PAGE_ID);
+            }
+        } else { // coverPage != null
+            if(book.getCoverImage() == null) {
+                coverImage = getFirstImageSource(coverPage, book.getResources());
+                book.setCoverImage(coverImage);
+                if (coverImage != null) {
+                    book.getResources().remove(coverImage.getHref());
+                }
+            } else { // coverImage != null
 
-	private void setCoverResourceIds(Book book) {
-		if(book.getCoverImage() != null) {
-			fixCoverResourceId(book, book.getCoverImage(), DEFAULT_COVER_IMAGE_ID);
-		}
-		if(book.getCoverPage() != null) {
-			fixCoverResourceId(book, book.getCoverPage(), DEFAULT_COVER_PAGE_ID);
-		}
-	}
+            }
+        }
 
-	
-	private void fixCoverResourceId(Book book, Resource resource, String defaultId) {
-		if (StringUtils.isBlank(resource.getId())) {
-			resource.setId(defaultId);
-		}
-		book.getResources().fixResourceId(resource);
-	}
-	
-	private String getCoverPageHref(Book book) {
-		return DEFAULT_COVER_PAGE_HREF;
-	}
-	
-	
-	private String getCoverImageHref(Resource imageResource, Book book) {
-		return DEFAULT_COVER_IMAGE_HREF;
-	}
-	
-	private Resource getFirstImageSource(Resource titlePageResource, Resources resources) {
-		try {
-			Document titlePageDocument = ResourceUtil.getAsDocument(titlePageResource);
-			NodeList imageElements = titlePageDocument.getElementsByTagName("img");
-			for (int i = 0; i < imageElements.getLength(); i++) {
-				String relativeImageHref = ((Element) imageElements.item(i)).getAttribute("src");
-				String absoluteImageHref = calculateAbsoluteImageHref(relativeImageHref, titlePageResource.getHref());
-				Resource imageResource = resources.getByHref(absoluteImageHref);
-				if (imageResource != null) {
-					return imageResource;
-				}
-			}
-		} catch (Exception e) {
-			log.error(e.getMessage(), e);
-		}
-		return null;
-	}
-	
-	
-	
-	// package
-	static String calculateAbsoluteImageHref(String relativeImageHref,
-			String baseHref) {
-		if (relativeImageHref.startsWith("/")) {
-			return relativeImageHref;
-		}
+        book.setCoverImage(coverImage);
+        book.setCoverPage(coverPage);
+        setCoverResourceIds(book);
+        return book;
+    }
+
+//    private String getCoverImageHref(Resource coverImageResource) {
+//        return "cover" + coverImageResource.getMediaType().getDefaultExtension();
+//    }
+
+    private Resource findCoverPage(Book book) {
+        if (book.getCoverPage() != null) {
+            return book.getCoverPage();
+        }
+        if (! (book.getSpine().isEmpty())) {
+            return book.getSpine().getResource(0);
+        }
+        return null;
+    }
+
+    private void setCoverResourceIds(Book book) {
+        if(book.getCoverImage() != null) {
+            fixCoverResourceId(book, book.getCoverImage(), DEFAULT_COVER_IMAGE_ID);
+        }
+        if(book.getCoverPage() != null) {
+            fixCoverResourceId(book, book.getCoverPage(), DEFAULT_COVER_PAGE_ID);
+        }
+    }
+
+    private void fixCoverResourceId(Book book, Resource resource, String defaultId) {
+        if (StringUtils.isBlank(resource.getId())) {
+            resource.setId(defaultId);
+        }
+        book.getResources().fixResourceId(resource);
+    }
+
+    private String getCoverPageHref(Book book) {
+        return DEFAULT_COVER_PAGE_HREF;
+    }
+
+    private String getCoverImageHref(Resource imageResource, Book book) {
+        return DEFAULT_COVER_IMAGE_HREF;
+    }
+
+    private Resource getFirstImageSource(Resource titlePageResource, Resources resources) {
+        try {
+            Document titlePageDocument = ResourceUtil.getAsDocument(titlePageResource);
+            NodeList imageElements = titlePageDocument.getElementsByTagName("img");
+            for (int i = 0; i < imageElements.getLength(); i++) {
+                String relativeImageHref = ((Element) imageElements.item(i)).getAttribute("src");
+                String absoluteImageHref = calculateAbsoluteImageHref(relativeImageHref, titlePageResource.getHref());
+                Resource imageResource = resources.getByHref(absoluteImageHref);
+                if (imageResource != null) {
+                    return imageResource;
+                }
+            }
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+        }
+        return null;
+    }
+
+    // package
+    static String calculateAbsoluteImageHref(String relativeImageHref,
+            String baseHref) {
+        if (relativeImageHref.startsWith("/")) {
+            return relativeImageHref;
+        }
         String result = FilenameUtils.normalize(baseHref.substring(0, baseHref.lastIndexOf('/') + 1) + relativeImageHref, true);
         return result;
-	}
+    }
 
-	private String createCoverpageHtml(String title, String imageHref) {
-	       return "" +
-	       		"<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">\n" +
-	       		"<html xmlns=\"http://www.w3.org/1999/xhtml\">\n" +
-	       		"\t<head>\n" +
-	       		"\t\t<title>Cover</title>\n" +
-	       		"\t\t<style type=\"text/css\"> img { max-width: 100%; } </style>\n" +
-	       		"\t</head>\n" +
-	       		"\t<body>\n" +
-	       		"\t\t<div id=\"cover-image\">\n" +
-	       		"\t\t\t<img src=\"" + StringEscapeUtils.escapeHtml(imageHref) + "\" alt=\"" + StringEscapeUtils.escapeHtml(title) + "\"/>\n" +
-	       		"\t\t</div>\n" +
-	       		"\t</body>\n" +
-	       		"</html>\n";
-	}
-	
+    private String createCoverpageHtml(String title, String imageHref) {
+           return "" +
+                   "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">\n" +
+                   "<html xmlns=\"http://www.w3.org/1999/xhtml\">\n" +
+                   "\t<head>\n" +
+                   "\t\t<title>Cover</title>\n" +
+                   "\t\t<style type=\"text/css\"> img { max-width: 100%; } </style>\n" +
+                   "\t</head>\n" +
+                   "\t<body>\n" +
+                   "\t\t<div id=\"cover-image\">\n" +
+                   "\t\t\t<img src=\"" + StringEscapeUtils.escapeHtml(imageHref) + "\" alt=\"" + StringEscapeUtils.escapeHtml(title) + "\"/>\n" +
+                   "\t\t</div>\n" +
+                   "\t</body>\n" +
+                   "</html>\n";
+    }
+
     private Dimension calculateResizeSize(BufferedImage image) {
         Dimension result;
         if (image.getWidth() > image.getHeight()) {
@@ -184,9 +180,8 @@ public class CoverpageBookProcessor implements BookProcessor {
         return result;
     }
 
-
     @SuppressWarnings("unused")
-	private byte[] createThumbnail(byte[] imageData) throws IOException {
+    private byte[] createThumbnail(byte[] imageData) throws IOException {
         BufferedImage originalImage = ImageIO.read(new ByteArrayInputStream(imageData));
         Dimension thumbDimension = calculateResizeSize(originalImage);
         BufferedImage thumbnailImage = createResizedCopy(originalImage, (int) thumbDimension.getWidth(), (int) thumbDimension.getHeight(), false);

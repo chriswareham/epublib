@@ -9,10 +9,10 @@ import java.util.logging.Level;
 import nl.siegmann.epublib.viewer.ContentPane;
 
 public class DesktopUtil {
-    
+
     /**
      * Open a URL in the default web browser.
-     * 
+     *
      * @param url a URL to open in a web browser.
      * @return true if a browser has been launched.
      */
@@ -27,12 +27,12 @@ public class DesktopUtil {
         }
         return false;
     }
-    
+
     public static class BrowserLaunchException extends Exception {
 
         private BrowserLaunchException(String message, Throwable cause) {
             super(message, cause);
         }
-        
+
     }
 }

@@ -31,49 +31,48 @@ import org.xml.sax.EntityResolver;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
-
 /**
  * Uses the given xslFile to process all html resources of a Book.
- * 
+ *
  * @author paul
  *
  */
 public class XslBookProcessor extends HtmlBookProcessor implements BookProcessor {
 
-	private final static Logger log = LoggerFactory.getLogger(XslBookProcessor.class); 
+    private final static Logger log = LoggerFactory.getLogger(XslBookProcessor.class);
 
-	private Transformer transformer;
-	
-	public XslBookProcessor(String xslFileName) throws TransformerConfigurationException {
-		File xslFile = new File(xslFileName);
-		TransformerFactory transformerFactory = TransformerFactory.newInstance();
-		transformer = transformerFactory.newTransformer(new StreamSource(xslFile));
-	}
+    private Transformer transformer;
 
-	@Override
-	public byte[] processHtml(Resource resource, Book book, String encoding) throws IOException {
-		byte[] result = null;
-		try {
-		DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
-	    DocumentBuilder db = dbFactory.newDocumentBuilder();
-	    db.setEntityResolver(EpubProcessorSupport.getEntityResolver());
+    public XslBookProcessor(String xslFileName) throws TransformerConfigurationException {
+        File xslFile = new File(xslFileName);
+        TransformerFactory transformerFactory = TransformerFactory.newInstance();
+        transformer = transformerFactory.newTransformer(new StreamSource(xslFile));
+    }
 
-	    Document doc = db.parse(new InputSource(resource.getReader()));
-	    
-	    Source htmlSource = new DOMSource(doc.getDocumentElement());
-	    ByteArrayOutputStream out = new ByteArrayOutputStream();
-	    Writer writer = new OutputStreamWriter(out, "UTF-8");
-	    Result streamResult = new StreamResult(writer);
-	    try {
-	    	transformer.transform(htmlSource, streamResult);
-	    } catch (TransformerException e) {
-	    	log.error(e.getMessage(), e);
-	    	throw new IOException(e);
-	    }
-	    result = out.toByteArray();
-	    return result;
-		} catch (Exception e) {
-			throw new IOException(e);
-		}
-	}
+    @Override
+    public byte[] processHtml(Resource resource, Book book, String encoding) throws IOException {
+        byte[] result = null;
+        try {
+        DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+        DocumentBuilder db = dbFactory.newDocumentBuilder();
+        db.setEntityResolver(EpubProcessorSupport.getEntityResolver());
+
+        Document doc = db.parse(new InputSource(resource.getReader()));
+
+        Source htmlSource = new DOMSource(doc.getDocumentElement());
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        Writer writer = new OutputStreamWriter(out, "UTF-8");
+        Result streamResult = new StreamResult(writer);
+        try {
+            transformer.transform(htmlSource, streamResult);
+        } catch (TransformerException e) {
+            log.error(e.getMessage(), e);
+            throw new IOException(e);
+        }
+        result = out.toByteArray();
+        return result;
+        } catch (Exception e) {
+            throw new IOException(e);
+        }
+    }
 }
