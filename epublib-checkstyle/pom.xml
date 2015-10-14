@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+
+    <name>Checkstyle</name>
+
+    <artifactId>epublib-checkstyle</artifactId>
+    <packaging>jar</packaging>
+
+    <parent>
+        <groupId>nl.siegmann.epublib</groupId>
+        <artifactId>epublib-parent</artifactId>
+        <version>3.1</version>
+        <relativePath>../epublib-parent/pom.xml</relativePath>
+   </parent>
+
+</project>
