@@ -7,26 +7,33 @@ import nl.siegmann.epublib.domain.Resource;
 import nl.siegmann.epublib.util.StringUtil;
 
 /**
- * Used to tell NavigationEventListener just what kind of navigation action the user just did.
+ * This class describes a navigation event.
  *
  * @author paul
  */
 public class NavigationEvent extends EventObject {
-
-    private static final long serialVersionUID = -6346750144308952762L;
+    /**
+     * The serial version UID.
+     */
+    private static final long serialVersionUID = 1L;
 
     private Resource oldResource;
+
     private int oldSpinePos;
+
     private Navigator navigator;
+
     private Book oldBook;
+
     private int oldSectionPos;
+
     private String oldFragmentId;
 
-    public NavigationEvent(Object source) {
+    public NavigationEvent(final Object source) {
         super(source);
     }
 
-    public NavigationEvent(Object source, Navigator navigator) {
+    public NavigationEvent(final Object source, final Navigator navigator) {
         super(source);
         this.navigator = navigator;
         this.oldBook = navigator.getBook();
@@ -54,7 +61,7 @@ public class NavigationEvent extends EventObject {
     }
 
     // package
-    void setOldFragmentId(String oldFragmentId) {
+    void setOldFragmentId(final String oldFragmentId) {
         this.oldFragmentId = oldFragmentId;
     }
 
@@ -63,7 +70,7 @@ public class NavigationEvent extends EventObject {
     }
 
     // package
-    void setOldPagePos(int oldPagePos) {
+    void setOldPagePos(final int oldPagePos) {
         this.oldSectionPos = oldPagePos;
     }
 
@@ -91,11 +98,11 @@ public class NavigationEvent extends EventObject {
     }
 
     public boolean isSpinePosChanged() {
-        return getOldSpinePos() != getCurrentSpinePos();
+        return oldSpinePos != navigator.getCurrentSpinePos();
     }
 
     public boolean isFragmentChanged() {
-        return StringUtil.equals(getOldFragmentId(), getCurrentFragmentId());
+        return StringUtil.equals(oldFragmentId, navigator.getCurrentFragmentId());
     }
 
     public Resource getOldResource() {
@@ -105,28 +112,33 @@ public class NavigationEvent extends EventObject {
     public Resource getCurrentResource() {
         return navigator.getCurrentResource();
     }
-    public void setOldResource(Resource oldResource) {
+
+    public void setOldResource(final Resource oldResource) {
         this.oldResource = oldResource;
     }
 
-    public void setOldSpinePos(int oldSpinePos) {
+    public void setOldSpinePos(final int oldSpinePos) {
         this.oldSpinePos = oldSpinePos;
     }
 
-    public void setNavigator(Navigator navigator) {
+    public void setNavigator(final Navigator navigator) {
         this.navigator = navigator;
     }
 
-    public void setOldBook(Book oldBook) {
+    public void setOldBook(final Book oldBook) {
         this.oldBook = oldBook;
     }
 
     public Book getCurrentBook() {
-        return getNavigator().getBook();
+        return navigator.getBook();
     }
 
     public boolean isResourceChanged() {
-        return oldResource != getCurrentResource();
+        return oldResource != navigator.getCurrentResource();
+    }
+
+    public boolean isSectionPosChanged() {
+        return oldSectionPos != navigator.getCurrentSectionPos();
     }
 
     @Override
@@ -137,15 +149,11 @@ public class NavigationEvent extends EventObject {
                 "oldBook", oldBook,
                 "oldFragmentId", oldFragmentId,
                 "oldSpinePos", oldSpinePos,
-                "currentPagePos", getCurrentSectionPos(),
-                "currentResource", getCurrentResource(),
-                "currentBook", getCurrentBook(),
-                "currentFragmentId", getCurrentFragmentId(),
-                "currentSpinePos", getCurrentSpinePos()
+                "currentPagePos", navigator.getCurrentSectionPos(),
+                "currentResource", navigator.getCurrentResource(),
+                "currentBook", navigator.getBook(),
+                "currentFragmentId", navigator.getCurrentFragmentId(),
+                "currentSpinePos", navigator.getCurrentSpinePos()
         );
-    }
-
-    public boolean isSectionPosChanged() {
-        return oldSectionPos != getCurrentSectionPos();
     }
 }

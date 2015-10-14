@@ -15,27 +15,22 @@ import nl.siegmann.epublib.domain.Resource;
 public class NavigationHistory implements NavigationEventListener {
 
     public static final int DEFAULT_MAX_HISTORY_SIZE = 1000;
-    private static final long DEFAULT_HISTORY_WAIT_TIME = 1000;
 
-    private static class Location {
-        private final String href;
+    public static final long DEFAULT_HISTORY_WAIT_TIME = 1000L;
 
-        Location(final String href) {
-            this.href = href;
-        }
-
-        public String getHref() {
-            return href;
-        }
-    }
-
-    private long lastUpdateTime = 0;
-    private List<Location> locations = new ArrayList<Location>();
-    private final Navigator navigator;
-    private int currentPos = -1;
-    private int currentSize = 0;
     private int maxHistorySize = DEFAULT_MAX_HISTORY_SIZE;
+
     private long historyWaitTime = DEFAULT_HISTORY_WAIT_TIME;
+
+    private long lastUpdateTime;
+
+    private List<Location> locations = new ArrayList<>();
+
+    private final Navigator navigator;
+
+    private int currentPos = -1;
+
+    private int currentSize;
 
     public NavigationHistory(final Navigator navigator) {
         this.navigator = navigator;
@@ -51,11 +46,12 @@ public class NavigationHistory implements NavigationEventListener {
         return currentSize;
     }
 
-    public void initBook(Book book) {
+    public void initBook(final Book book) {
         if (book == null) {
             return;
         }
-        locations = new ArrayList<Location>();
+
+        locations = new ArrayList<>();
         currentPos = -1;
         currentSize = 0;
         if (navigator.getCurrentResource() != null) {
@@ -64,8 +60,10 @@ public class NavigationHistory implements NavigationEventListener {
     }
 
     /**
-     * If the time between a navigation event is less than the historyWaitTime then the new location is not added to the history.
-     * When a user is rapidly viewing many pages using the slider we do not want all of them to be added to the history.
+     * If the time between a navigation event is less than the historyWaitTime
+     * then the new location is not added to the history.
+     * When a user is rapidly viewing many pages using the slider we do not want
+     * all of them to be added to the history.
      *
      * @return the time we wait before adding the page to the history
      */
@@ -73,30 +71,34 @@ public class NavigationHistory implements NavigationEventListener {
         return historyWaitTime;
     }
 
-    public void setHistoryWaitTime(long historyWaitTime) {
+    public void setHistoryWaitTime(final long historyWaitTime) {
         this.historyWaitTime = historyWaitTime;
     }
 
-    public void addLocation(Resource resource) {
-        if (resource == null) {
-            return;
+    public void addLocation(final Resource resource) {
+        if (resource != null) {
+            addLocation(resource.getHref());
         }
-        addLocation(resource.getHref());
+    }
+
+    public void addLocation(final String href) {
+        addLocation(new Location(href));
     }
 
     /**
      * Adds the location after the current position.
-     * If the currentposition is not the end of the list then the elements between the current element and the end of the list will be discarded.
+     * If the current position is not the end of the list then the elements
+     * between the current element and the end of the list will be discarded.
      * Does nothing if the new location matches the current location.
      * <br/>
-     * If this nr of locations becomes larger then the historySize then the first item(s) will be removed.
+     * If this number of locations becomes larger then the historySize then the
+     * first item(s) will be removed.
      *
-     * @param location
+     * @param location the location to add
      */
-    public void addLocation(Location location) {
+    public void addLocation(final Location location) {
         // do nothing if the new location matches the current location
-        if ( !(locations.isEmpty()) &&
-                location.getHref().equals(locations.get(currentPos).getHref())) {
+        if (!(locations.isEmpty()) && location.getHref().equals(locations.get(currentPos).getHref())) {
             return;
         }
         currentPos++;
@@ -114,18 +116,14 @@ public class NavigationHistory implements NavigationEventListener {
      *
      */
     private void checkHistorySize() {
-        while(locations.size() > maxHistorySize) {
+        while (locations.size() > maxHistorySize) {
             locations.remove(0);
             currentSize--;
             currentPos--;
         }
     }
 
-    public void addLocation(String href) {
-        addLocation(new Location(href));
-    }
-
-    private String getLocationHref(int pos) {
+    private String getLocationHref(final int pos) {
         if (pos < 0 || pos >= locations.size()) {
             return null;
         }
@@ -142,9 +140,8 @@ public class NavigationHistory implements NavigationEventListener {
      *
      * @return Whether we actually moved. If the requested value is illegal it will return false, true otherwise.
      */
-    public boolean move(int delta) {
-        if (((currentPos + delta) < 0)
-        || ((currentPos + delta) >= currentSize)) {
+    public boolean move(final int delta) {
+        if (((currentPos + delta) < 0) || ((currentPos + delta) >= currentSize)) {
             return false;
         }
         currentPos += delta;
@@ -153,22 +150,26 @@ public class NavigationHistory implements NavigationEventListener {
     }
 
     /**
-     * If this is not the source of the navigationEvent then the addLocation will be called with the href of the currentResource in the navigationEvent.
+     * If this is not the source of the navigationEvent then the addLocation
+     * will be called with the href of the currentResource in the
+     * navigationEvent.
+     *
+     * @param event the navigation event
      */
     @Override
-    public void navigationPerformed(NavigationEvent navigationEvent) {
-        if (this == navigationEvent.getSource()) {
+    public void navigationPerformed(final NavigationEvent event) {
+        if (this == event.getSource()) {
             return;
         }
-        if (navigationEvent.getCurrentResource() == null) {
+
+        if (event.getCurrentResource() == null) {
             return;
         }
 
         if ((System.currentTimeMillis() - this.lastUpdateTime) > historyWaitTime) {
             // if the user scrolled rapidly through the pages then the last page will not be added to the history. We fix that here:
-            addLocation(navigationEvent.getOldResource());
-
-            addLocation(navigationEvent.getCurrentResource().getHref());
+            addLocation(event.getOldResource());
+            addLocation(event.getCurrentResource().getHref());
         }
         lastUpdateTime = System.currentTimeMillis();
     }
@@ -180,11 +181,24 @@ public class NavigationHistory implements NavigationEventListener {
         return locations.get(currentPos).getHref();
     }
 
-    public void setMaxHistorySize(int maxHistorySize) {
+    public void setMaxHistorySize(final int maxHistorySize) {
         this.maxHistorySize = maxHistorySize;
     }
 
     public int getMaxHistorySize() {
         return maxHistorySize;
+    }
+
+    public static class Location {
+
+        private final String href;
+
+        public Location(final String href) {
+            this.href = href;
+        }
+
+        public String getHref() {
+            return href;
+        }
     }
 }

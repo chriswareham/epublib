@@ -111,7 +111,7 @@ public class ResourcesLoaderTest {
 		ZipFile zipFile = new ZipFile(testBookFilename);
 		
 		// when
-		Resources resources = ResourcesLoader.loadResources(zipFile, encoding, Arrays.asList(MediatypeService.mediatypes));
+		Resources resources = ResourcesLoader.loadResources(zipFile, encoding, Arrays.asList(MediatypeService.MEDIA_TYPES));
 		
 		// then
 		verifyResources(resources);

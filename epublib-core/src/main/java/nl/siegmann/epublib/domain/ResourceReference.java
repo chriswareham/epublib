@@ -3,27 +3,27 @@ package nl.siegmann.epublib.domain;
 import java.io.Serializable;
 
 public class ResourceReference implements Serializable {
-
     /**
-     *
+     * The serial version UID.
      */
-    private static final long serialVersionUID = 2596967243557743048L;
-    protected Resource resource;
+    private static final long serialVersionUID = 1L;
 
-    public ResourceReference(Resource resource) {
+    private Resource resource;
+
+    public ResourceReference(final Resource resource) {
         this.resource = resource;
     }
 
-    public Resource getResource() {
+    public final Resource getResource() {
         return resource;
     }
 
     /**
      * Besides setting the resource it also sets the fragmentId to null.
      *
-     * @param resource
+     * @param resource the resource
      */
-    public void setResource(Resource resource) {
+    public void setResource(final Resource resource) {
         this.resource = resource;
     }
 
@@ -35,9 +35,6 @@ public class ResourceReference implements Serializable {
      * @return The id of the reference referred to.
      */
     public String getResourceId() {
-        if (resource != null) {
-            return resource.getId();
-        }
-        return null;
+        return resource != null ? resource.getId() : null;
     }
 }

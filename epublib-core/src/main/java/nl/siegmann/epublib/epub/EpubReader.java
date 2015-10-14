@@ -75,7 +75,7 @@ public class EpubReader {
      * @throws IOException
      */
     public Book readEpubLazy(ZipFile zipFile, String encoding ) throws IOException {
-        return readEpubLazy(zipFile, encoding, Arrays.asList(MediatypeService.mediatypes) );
+        return readEpubLazy(zipFile, encoding, Arrays.asList(MediatypeService.MEDIA_TYPES) );
     }
 
     public Book readEpub(ZipInputStream in, String encoding) throws IOException {

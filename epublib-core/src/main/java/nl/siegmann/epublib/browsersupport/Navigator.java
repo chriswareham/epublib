@@ -1,8 +1,8 @@
 package nl.siegmann.epublib.browsersupport;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import nl.siegmann.epublib.domain.Book;
 import nl.siegmann.epublib.domain.Resource;
@@ -10,63 +10,54 @@ import nl.siegmann.epublib.domain.Resource;
 /**
  * A helper class for epub browser applications.
  *
- * It helps moving from one resource to the other, from one resource to the other and keeping other
- * elements of the application up-to-date by calling the NavigationEventListeners.
+ * It helps moving from one resource to the other, from one resource to the
+ * other and keeping other elements of the application up-to-date by calling the
+ * NavigationEventListeners.
  *
  * @author paul
- *
  */
 public class Navigator implements Serializable {
-
     /**
-     *
+     * The serial version UID.
      */
-    private static final long serialVersionUID = 1076126986424925474L;
+    private static final long serialVersionUID = 1L;
+
     private Book book;
-    private int currentSpinePos;
+
     private Resource currentResource;
-    private int currentPagePos;
+
     private String currentFragmentId;
 
-    private final List<NavigationEventListener> eventListeners = new ArrayList<NavigationEventListener>();
+    private int currentSpinePos;
+
+    private int currentPagePos;
+
+    private final List<NavigationEventListener> eventListeners = new CopyOnWriteArrayList<>();
 
     public Navigator() {
         this(null);
     }
 
-    public Navigator(Book book) {
+    public Navigator(final Book book) {
         this.book = book;
-        this.currentSpinePos = 0;
         if (book != null) {
             this.currentResource = book.getCoverPage();
         }
-        this.currentPagePos = 0;
     }
 
-    private synchronized void handleEventListeners(NavigationEvent navigationEvent) {
-        for (int i = 0; i < eventListeners.size(); i++) {
-            NavigationEventListener navigationEventListener = eventListeners.get(i);
-            navigationEventListener.navigationPerformed(navigationEvent);
-        }
+    public Book getBook() {
+        return book;
     }
 
-    public boolean addNavigationEventListener(NavigationEventListener navigationEventListener) {
-        return this.eventListeners.add(navigationEventListener);
-    }
-
-    public boolean removeNavigationEventListener(NavigationEventListener navigationEventListener) {
-        return this.eventListeners.remove(navigationEventListener);
-    }
-
-    public int gotoFirstSpineSection(Object source) {
+    public int gotoFirstSpineSection(final Object source) {
         return gotoSpineSection(0, source);
     }
 
-    public int gotoPreviousSpineSection(Object source) {
+    public int gotoPreviousSpineSection(final Object source) {
         return gotoPreviousSpineSection(0, source);
     }
 
-    public int gotoPreviousSpineSection(int pagePos, Object source) {
+    public int gotoPreviousSpineSection(final int pagePos, final Object source) {
         if (currentSpinePos < 0) {
             return gotoSpineSection(0, pagePos, source);
         }
@@ -74,56 +65,56 @@ public class Navigator implements Serializable {
     }
 
     public boolean hasNextSpineSection() {
-        return (currentSpinePos < (book.getSpine().size() - 1));
+        return currentSpinePos < (book.getSpine().size() - 1);
     }
 
     public boolean hasPreviousSpineSection() {
-        return (currentSpinePos > 0);
+        return currentSpinePos > 0;
     }
 
-    public int gotoNextSpineSection(Object source) {
+    public int gotoNextSpineSection(final Object source) {
         if (currentSpinePos < 0) {
             return gotoSpineSection(0, source);
         }
         return gotoSpineSection(currentSpinePos + 1, source);
     }
 
-    public int gotoResource(String resourceHref, Object source) {
-        Resource resource = book.getResources().getByHref(resourceHref);
-        return gotoResource(resource, source);
+    public int gotoResource(final String resourceHref, final Object source) {
+        return gotoResource(book.getResources().getByHref(resourceHref), source);
     }
 
-    public int gotoResource(Resource resource, Object source) {
+    public int gotoResource(final Resource resource, final Object source) {
         return gotoResource(resource, 0, null, source);
     }
 
-    public int gotoResource(Resource resource, String fragmentId, Object source) {
+    public int gotoResource(final Resource resource, final String fragmentId, final Object source) {
         return gotoResource(resource, 0, fragmentId, source);
     }
 
-    public int gotoResource(Resource resource, int pagePos, Object source) {
+    public int gotoResource(final Resource resource, final int pagePos, final Object source) {
         return gotoResource(resource, pagePos, null, source);
     }
 
-    public int gotoResource(Resource resource, int pagePos, String fragmentId, Object source) {
+    public int gotoResource(final Resource resource, final int pagePos, final String fragmentId, final Object source) {
         if (resource == null) {
             return -1;
         }
-        NavigationEvent navigationEvent = new NavigationEvent(source, this);
-        this.currentResource = resource;
-        this.currentSpinePos = book.getSpine().getResourceIndex(currentResource);
-        this.currentPagePos = pagePos;
-        this.currentFragmentId = fragmentId;
-        handleEventListeners(navigationEvent);
+
+        currentResource = resource;
+        currentSpinePos = book.getSpine().getResourceIndex(currentResource);
+        currentPagePos = pagePos;
+        currentFragmentId = fragmentId;
+
+        handleEventListeners(new NavigationEvent(source, this));
 
         return currentSpinePos;
     }
 
-    public int gotoResourceId(String resourceId, Object source) {
+    public int gotoResourceId(final String resourceId, final Object source) {
         return gotoSpineSection(book.getSpine().findFirstResourceById(resourceId), source);
     }
 
-    public int gotoSpineSection(int newSpinePos, Object source) {
+    public int gotoSpineSection(final int newSpinePos, final Object source) {
         return gotoSpineSection(newSpinePos, 0, source);
     }
 
@@ -131,43 +122,46 @@ public class Navigator implements Serializable {
      * Go to a specific section.
      * Illegal spine positions are silently ignored.
      *
-     * @param newSpinePos
-     * @param source
-     * @return The current position within the spine
+     * @param newSpinePos the new spine position
+     * @param newPagePos the new page position
+     * @param source the source of the change of position
+     * @return the current position within the spine
      */
-    public int gotoSpineSection(int newSpinePos, int newPagePos, Object source) {
+    public int gotoSpineSection(final int newSpinePos, final int newPagePos, final Object source) {
         if (newSpinePos == currentSpinePos) {
             return currentSpinePos;
         }
         if (newSpinePos < 0 || newSpinePos >= book.getSpine().size()) {
             return currentSpinePos;
         }
-        NavigationEvent navigationEvent = new NavigationEvent(source, this);
+
         currentSpinePos = newSpinePos;
         currentPagePos = newPagePos;
         currentResource = book.getSpine().getResource(currentSpinePos);
-        handleEventListeners(navigationEvent);
+
+        handleEventListeners(new NavigationEvent(source, this));
+
         return currentSpinePos;
     }
 
-    public int gotoLastSpineSection(Object source) {
+    public int gotoLastSpineSection(final Object source) {
         return gotoSpineSection(book.getSpine().size() - 1, source);
     }
 
-    public void gotoBook(Book book, Object source) {
-        NavigationEvent navigationEvent = new NavigationEvent(source, this);
-        this.book = book;
-        this.currentFragmentId = null;
-        this.currentPagePos = 0;
-        this.currentResource = null;
-        this.currentSpinePos = book.getSpine().getResourceIndex(currentResource);
-        handleEventListeners(navigationEvent);
+    public void gotoBook(final Book newBook, final Object source) {
+        book = newBook;
+        currentFragmentId = null;
+        currentPagePos = 0;
+        currentResource = null;
+        currentSpinePos = newBook.getSpine().getResourceIndex(currentResource);
+
+        handleEventListeners(new NavigationEvent(source, this));
     }
 
     /**
      * The current position within the spine.
      *
-     * @return something < 0 if the current position is not within the spine.
+     * @return something less than 0 if the current position is not within the spine.
      */
     public int getCurrentSpinePos() {
         return currentSpinePos;
@@ -178,19 +172,15 @@ public class Navigator implements Serializable {
     }
 
     /**
-     * Sets the current index and resource without calling the eventlisteners.
+     * Sets the current index and resource without calling the event listeners.
      *
      * If you want the eventListeners called use gotoSection(index);
      *
-     * @param currentIndex
+     * @param newIndex the new index
      */
-    public void setCurrentSpinePos(int currentIndex) {
-        this.currentSpinePos = currentIndex;
-        this.currentResource = book.getSpine().getResource(currentIndex);
-    }
-
-    public Book getBook() {
-        return book;
+    public void setCurrentSpinePos(final int newIndex) {
+        currentSpinePos = newIndex;
+        currentResource = book.getSpine().getResource(newIndex);
     }
 
     /**
@@ -198,10 +188,12 @@ public class Navigator implements Serializable {
      *
      * If you want the eventListeners called use gotoSection(index);
      *
+     * @param newResource the new resource
+     * @return the current index
      */
-    public int setCurrentResource(Resource currentResource) {
-        this.currentSpinePos = book.getSpine().getResourceIndex(currentResource);
-        this.currentResource = currentResource;
+    public int setCurrentResource(final Resource newResource) {
+        currentSpinePos = book.getSpine().getResourceIndex(newResource);
+        currentResource = newResource;
         return currentSpinePos;
     }
 
@@ -211,5 +203,19 @@ public class Navigator implements Serializable {
 
     public int getCurrentSectionPos() {
         return currentPagePos;
+    }
+
+    public boolean addNavigationEventListener(final NavigationEventListener eventListener) {
+        return eventListeners.add(eventListener);
+    }
+
+    public boolean removeNavigationEventListener(final NavigationEventListener eventListener) {
+        return eventListeners.remove(eventListener);
+    }
+
+    private void handleEventListeners(final NavigationEvent event) {
+        for (NavigationEventListener eventListener : eventListeners) {
+            eventListener.navigationPerformed(event);
+        }
     }
 }

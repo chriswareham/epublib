@@ -16,27 +16,24 @@ import java.util.Set;
  *
  * See the spine for the complete list of sections in the order in which they should be read.
  *
- * @see nl.siegmann.epublib.domain.Spine
- *
  * @author paul
- *
+ * @see nl.siegmann.epublib.domain.Spine
  */
 public class TableOfContents implements Serializable {
-
     /**
-     *
+     * The serial version UID.
      */
-    private static final long serialVersionUID = -3147391239966275152L;
+    private static final long serialVersionUID = 1L;
 
-    public static final String DEFAULT_PATH_SEPARATOR = "/";
+    private static final String DEFAULT_PATH_SEPARATOR = "/";
 
     private List<TOCReference> tocReferences;
 
     public TableOfContents() {
-        this(new ArrayList<TOCReference>());
+        this(new ArrayList<>());
     }
 
-    public TableOfContents(List<TOCReference> tocReferences) {
+    public TableOfContents(final List<TOCReference> tocReferences) {
         this.tocReferences = tocReferences;
     }
 
@@ -44,45 +41,29 @@ public class TableOfContents implements Serializable {
         return tocReferences;
     }
 
-    public void setTocReferences(List<TOCReference> tocReferences) {
+    public void setTocReferences(final List<TOCReference> tocReferences) {
         this.tocReferences = tocReferences;
     }
 
     /**
      * Calls addTOCReferenceAtLocation after splitting the path using the DEFAULT_PATH_SEPARATOR.
+     *
      * @return the new TOCReference
      */
-    public TOCReference addSection(Resource resource, String path) {
+    public TOCReference addSection(final Resource resource, final String path) {
         return addSection(resource, path, DEFAULT_PATH_SEPARATOR);
     }
 
     /**
      * Calls addTOCReferenceAtLocation after splitting the path using the given pathSeparator.
      *
-     * @param resource
-     * @param path
-     * @param pathSeparator
+     * @param resource the resource to add
+     * @param path the location to add the resource at
+     * @param pathSeparator the path separator for the location
      * @return the new TOCReference
      */
-    public TOCReference addSection(Resource resource, String path, String pathSeparator) {
-        String[] pathElements = path.split(pathSeparator);
-        return addSection(resource, pathElements);
-    }
-
-    /**
-     * Finds the first TOCReference in the given list that has the same title as the given Title.
-     *
-     * @param title
-     * @param tocReferences
-     * @return null if not found.
-     */
-    private static TOCReference findTocReferenceByTitle(String title, List<TOCReference> tocReferences) {
-        for (TOCReference tocReference: tocReferences) {
-            if (title.equals(tocReference.getTitle())) {
-                return tocReference;
-            }
-        }
-        return null;
+    public TOCReference addSection(final Resource resource, final String path, final String pathSeparator) {
+        return addSection(resource, path.split(pathSeparator));
     }
 
     /**
@@ -97,11 +78,11 @@ public class TableOfContents implements Serializable {
      * will point to the given Resource</li>
      * </ul>
      *
-     * @param resource
-     * @param pathElements
+     * @param resource the resource to add
+     * @param pathElements the location to add the resource at
      * @return the new TOCReference
      */
-    public TOCReference addSection(Resource resource, String[] pathElements) {
+    public TOCReference addSection(final Resource resource, final String[] pathElements) {
         if (pathElements == null || pathElements.length == 0) {
             return null;
         }
@@ -132,17 +113,19 @@ public class TableOfContents implements Serializable {
      * If this TOCReference didn't exist yet it will be created and have a title of ""</li>
      * </ul>
      *
-     * @param resource
-     * @param pathElements
+     * @param resource the resource to add
+     * @param pathElements the location to add the resource at
+     * @param sectionTitlePrefix the section title prefix
+     * @param sectionNumberSeparator the section number separator
      * @return the new TOCReference
      */
-    public TOCReference addSection(Resource resource, int[] pathElements, String sectionTitlePrefix, String sectionNumberSeparator) {
+    public TOCReference addSection(final Resource resource, final int[] pathElements, final String sectionTitlePrefix, final String sectionNumberSeparator) {
         if (pathElements == null || pathElements.length == 0) {
             return null;
         }
         TOCReference result = null;
         List<TOCReference> currentTocReferences = this.tocReferences;
-        for (int i = 0; i < pathElements.length; i++) {
+        for (int i = 0; i < pathElements.length; ++i) {
             int currentIndex = pathElements[i];
             if (currentIndex > 0 && currentIndex < (currentTocReferences.size() - 1)) {
                 result = currentTocReferences.get(currentIndex);
@@ -159,19 +142,54 @@ public class TableOfContents implements Serializable {
         return result;
     }
 
-    private void paddTOCReferences(List<TOCReference> currentTocReferences,
-            int[] pathElements, int pathPos, String sectionPrefix, String sectionNumberSeparator) {
-        for (int i = currentTocReferences.size(); i <= pathElements[pathPos]; i++) {
-            String sectionTitle = createSectionTitle(pathElements, pathPos, i, sectionPrefix,
-                    sectionNumberSeparator);
+    public TOCReference addTOCReference(final TOCReference tocReference) {
+        if (tocReferences == null) {
+            tocReferences = new ArrayList<>();
+        }
+        tocReferences.add(tocReference);
+        return tocReference;
+    }
+
+    /**
+     * All unique references (unique by href) in the order in which they are referenced to in the table of contents.
+     *
+     * @return All unique references (unique by href) in the order in which they are referenced to in the table of contents.
+     */
+    public List<Resource> getAllUniqueResources() {
+        Set<String> uniqueHrefs = new HashSet<>();
+        List<Resource> result = new ArrayList<>();
+        getAllUniqueResources(uniqueHrefs, result, tocReferences);
+        return result;
+    }
+
+    /**
+     * The total number of references in this table of contents.
+     *
+     * @return The total number of references in this table of contents.
+     */
+    public int size() {
+        return getTotalSize(tocReferences);
+    }
+
+    /**
+     * The maximum depth of the reference tree.
+     *
+     * @return The maximum depth of the reference tree
+     */
+    public int calculateDepth() {
+        return calculateDepth(tocReferences, 0);
+    }
+
+    private void paddTOCReferences(final List<TOCReference> currentTocReferences, final int[] pathElements, final int pathPos, final String sectionPrefix, final String sectionNumberSeparator) {
+        for (int i = currentTocReferences.size(); i <= pathElements[pathPos]; ++i) {
+            String sectionTitle = createSectionTitle(pathElements, pathPos, i, sectionPrefix, sectionNumberSeparator);
             currentTocReferences.add(new TOCReference(sectionTitle, null));
         }
     }
 
-    private String createSectionTitle(int[] pathElements, int pathPos, int lastPos,
-            String sectionPrefix, String sectionNumberSeparator) {
+    private String createSectionTitle(final int[] pathElements, final int pathPos, final int lastPos, final String sectionPrefix, final String sectionNumberSeparator) {
         StringBuilder title = new StringBuilder(sectionPrefix);
-        for (int i = 0; i < pathPos; i++) {
+        for (int i = 0; i < pathPos; ++i) {
             if (i > 0) {
                 title.append(sectionNumberSeparator);
             }
@@ -184,63 +202,7 @@ public class TableOfContents implements Serializable {
         return title.toString();
     }
 
-    public TOCReference addTOCReference(TOCReference tocReference) {
-        if (tocReferences == null) {
-            tocReferences = new ArrayList<TOCReference>();
-        }
-        tocReferences.add(tocReference);
-        return tocReference;
-    }
-
-    /**
-     * All unique references (unique by href) in the order in which they are referenced to in the table of contents.
-     *
-     * @return All unique references (unique by href) in the order in which they are referenced to in the table of contents.
-     */
-    public List<Resource> getAllUniqueResources() {
-        Set<String> uniqueHrefs = new HashSet<String>();
-        List<Resource> result = new ArrayList<Resource>();
-        getAllUniqueResources(uniqueHrefs, result, tocReferences);
-        return result;
-    }
-
-    private static void getAllUniqueResources(Set<String> uniqueHrefs, List<Resource> result, List<TOCReference> tocReferences) {
-        for (TOCReference tocReference: tocReferences) {
-            Resource resource = tocReference.getResource();
-            if (resource != null && ! uniqueHrefs.contains(resource.getHref())) {
-                uniqueHrefs.add(resource.getHref());
-                result.add(resource);
-            }
-            getAllUniqueResources(uniqueHrefs, result, tocReference.getChildren());
-        }
-    }
-
-    /**
-     * The total number of references in this table of contents.
-     *
-     * @return The total number of references in this table of contents.
-     */
-    public int size() {
-        return getTotalSize(tocReferences);
-    }
-
-    private static int getTotalSize(Collection<TOCReference> tocReferences) {
-        int result = tocReferences.size();
-        for (TOCReference tocReference: tocReferences) {
-            result += getTotalSize(tocReference.getChildren());
-        }
-        return result;
-    }
-
-    /**
-     * The maximum depth of the reference tree
-     * @return The maximum depth of the reference tree
-     */
-    public int calculateDepth() {
-        return calculateDepth(tocReferences, 0);
-    }
-
-    private int calculateDepth(List<TOCReference> tocReferences, int currentDepth) {
+    private static int calculateDepth(final List<TOCReference> tocReferences, final int currentDepth) {
         int maxChildDepth = 0;
         for (TOCReference tocReference: tocReferences) {
             int childDepth = calculateDepth(tocReference.getChildren(), 1);
@@ -249,5 +211,40 @@ public class TableOfContents implements Serializable {
             }
         }
         return currentDepth + maxChildDepth;
+    }
+
+    /**
+     * Finds the first TOCReference in the given list that has the same title as the given Title.
+     *
+     * @param title the title to find
+     * @param tocReferences the references it find the title in
+     * @return null if not found.
+     */
+    private static TOCReference findTocReferenceByTitle(final String title, final List<TOCReference> tocReferences) {
+        for (TOCReference tocReference: tocReferences) {
+            if (title.equals(tocReference.getTitle())) {
+                return tocReference;
+            }
+        }
+        return null;
+    }
+
+    private static void getAllUniqueResources(final Set<String> uniqueHrefs, final List<Resource> result, final List<TOCReference> tocReferences) {
+        for (TOCReference tocReference: tocReferences) {
+            Resource resource = tocReference.getResource();
+            if (resource != null && !uniqueHrefs.contains(resource.getHref())) {
+                uniqueHrefs.add(resource.getHref());
+                result.add(resource);
+            }
+            getAllUniqueResources(uniqueHrefs, result, tocReference.getChildren());
+        }
+    }
+
+    private static int getTotalSize(final Collection<TOCReference> tocReferences) {
+        int result = tocReferences.size();
+        for (TOCReference tocReference: tocReferences) {
+            result += getTotalSize(tocReference.getChildren());
+        }
+        return result;
     }
 }

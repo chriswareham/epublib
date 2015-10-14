@@ -6,23 +6,24 @@ import nl.siegmann.epublib.Constants;
 import nl.siegmann.epublib.util.StringUtil;
 
 public class TitledResourceReference extends ResourceReference implements Serializable {
-
     /**
-     *
+     * The serial version UID.
      */
-    private static final long serialVersionUID = 3918155020095190080L;
+    private static final long serialVersionUID = 1L;
+
     private String fragmentId;
+
     private String title;
 
-    public TitledResourceReference(Resource resource) {
+    public TitledResourceReference(final Resource resource) {
         this(resource, null);
     }
 
-    public TitledResourceReference(Resource resource, String title) {
+    public TitledResourceReference(final Resource resource, final String title) {
         this(resource, title, null);
     }
 
-    public TitledResourceReference(Resource resource, String title, String fragmentId) {
+    public TitledResourceReference(final Resource resource, final String title, final String fragmentId) {
         super(resource);
         this.title = title;
         this.fragmentId = fragmentId;
@@ -32,7 +33,7 @@ public class TitledResourceReference extends ResourceReference implements Serial
         return fragmentId;
     }
 
-    public void setFragmentId(String fragmentId) {
+    public void setFragmentId(final String fragmentId) {
         this.fragmentId = fragmentId;
     }
 
@@ -40,8 +41,29 @@ public class TitledResourceReference extends ResourceReference implements Serial
         return title;
     }
 
-    public void setTitle(String title) {
+    public void setTitle(final String title) {
         this.title = title;
+    }
+
+    /**
+     * Sets the resource to the given resource and sets the fragmentId to null.
+     *
+     * @param resource the resource
+     */
+    @Override
+    public void setResource(final Resource resource) {
+        setResource(resource, null);
+    }
+
+    /**
+     * Sets the resource and fragmentId to the given resource and fragmentId.
+     *
+     * @param resource the resource
+     * @param fragmentId the fragmentId
+     */
+    public void setResource(final Resource resource, final String fragmentId) {
+        super.setResource(resource);
+        this.fragmentId = fragmentId;
     }
 
     /**
@@ -51,22 +73,8 @@ public class TitledResourceReference extends ResourceReference implements Serial
      */
     public String getCompleteHref() {
         if (StringUtil.isBlank(fragmentId)) {
-            return resource.getHref();
-        } else {
-            return resource.getHref() + Constants.FRAGMENT_SEPARATOR_CHAR + fragmentId;
+            return getResource().getHref();
         }
-    }
-
-    public void setResource(Resource resource, String fragmentId) {
-        super.setResource(resource);
-        this.fragmentId = fragmentId;
-    }
-
-    /**
-     * Sets the resource to the given resource and sets the fragmentId to null.
-     *
-     */
-    public void setResource(Resource resource) {
-        setResource(resource, null);
+        return getResource().getHref() + Constants.FRAGMENT_SEPARATOR_CHAR + fragmentId;
     }
 }

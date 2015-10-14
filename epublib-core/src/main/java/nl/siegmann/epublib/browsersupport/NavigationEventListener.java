@@ -1,15 +1,16 @@
 package nl.siegmann.epublib.browsersupport;
 
 /**
- * Implemented by classes that want to be notified if the user moves to another location in the book.
+ * Implemented by classes that want to be notified whenever a user navigates to
+ * another position in a book.
  *
  * @author paul
  */
 public interface NavigationEventListener {
     /**
-     * Called whenever the user navigates to another position in the book.
+     * Called whenever a user navigates to another position in a book.
      *
-     * @param navigationEvent
+     * @param event the event describing the navigation action
      */
-    void navigationPerformed(NavigationEvent navigationEvent);
+    void navigationPerformed(NavigationEvent event);
 }
