@@ -38,14 +38,22 @@ public class EpubWriter {
         this.bookProcessor = bookProcessor;
     }
 
-    public void write(Book book, OutputStream out) throws IOException {
-        book = preProcessBook(book);
+    public BookProcessor getBookProcessor() {
+        return bookProcessor;
+    }
+
+    public void setBookProcessor(BookProcessor bookProcessor) {
+        this.bookProcessor = bookProcessor;
+    }
+
+    public void write(final Book book, final OutputStream out) throws IOException {
+        Book preProcessedBook = preProcessBook(book);
         ZipOutputStream resultStream = new ZipOutputStream(out);
         writeMimeType(resultStream);
         writeContainer(resultStream);
-        initTOCResource(book);
-        writeResources(book, resultStream);
-        writePackageDocument(book, resultStream);
+        initTOCResource(preProcessedBook);
+        writeResources(preProcessedBook, resultStream);
+        writePackageDocument(preProcessedBook, resultStream);
         resultStream.close();
     }
 
@@ -53,10 +61,9 @@ public class EpubWriter {
         return bookProcessor != null ? bookProcessor.processBook(book) : book;
     }
 
-    private void initTOCResource(Book book) {
-        Resource tocResource;
+    private void initTOCResource(final Book book) {
         try {
-            tocResource = NCXDocument.createNCXResource(book);
+            Resource tocResource = NCXDocument.createNCXResource(book);
             Resource currentTocResource = book.getSpine().getTocResource();
             if (currentTocResource != null) {
                 book.getResources().remove(currentTocResource.getHref());
@@ -82,16 +89,15 @@ public class EpubWriter {
      * @throws IOException
      */
     private void writeResource(Resource resource, ZipOutputStream resultStream) throws IOException {
-        if(resource == null) {
-            return;
-        }
-        try {
-            resultStream.putNextEntry(new ZipEntry("OEBPS/" + resource.getHref()));
-            InputStream inputStream = resource.getInputStream();
-            IOUtil.copy(inputStream, resultStream);
-            inputStream.close();
-        } catch(Exception e) {
-            LOGGER.error(e.getMessage(), e);
+        if (resource != null) {
+            try {
+                resultStream.putNextEntry(new ZipEntry("OEBPS/" + resource.getHref()));
+                InputStream inputStream = resource.getInputStream();
+                IOUtil.copy(inputStream, resultStream);
+                inputStream.close();
+            } catch(Exception e) {
+                LOGGER.error(e.getMessage(), e);
+            }
         }
     }
 
@@ -100,8 +106,6 @@ public class EpubWriter {
         XmlSerializer xmlSerializer = EpubProcessorSupport.createXmlSerializer(resultStream);
         PackageDocumentWriter.write(this, xmlSerializer, book);
         xmlSerializer.flush();
-//        String resultAsString = result.toString();
-//        resultStream.write(resultAsString.getBytes(Constants.ENCODING));
     }
 
     /**
@@ -154,13 +158,5 @@ public class EpubWriter {
 
     String getNcxMediaType() {
         return "application/x-dtbncx+xml";
-    }
-
-    public BookProcessor getBookProcessor() {
-        return bookProcessor;
-    }
-
-    public void setBookProcessor(BookProcessor bookProcessor) {
-        this.bookProcessor = bookProcessor;
     }
 }

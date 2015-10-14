@@ -15,9 +15,8 @@ import nl.siegmann.epublib.util.StringUtil;
  *
  */
 public class Identifier implements Serializable {
-
     /**
-     *
+     * The serial version UID.
      */
     private static final long serialVersionUID = 955949951416391810L;
 
@@ -28,9 +27,11 @@ public class Identifier implements Serializable {
         String URI = "URI";
     }
 
-    private boolean bookId = false;
     private String scheme;
+
     private String value;
+
+    private boolean bookId;
 
     /**
      * Creates an Identifier with as value a random UUID and scheme "UUID"
@@ -45,8 +46,9 @@ public class Identifier implements Serializable {
     }
 
     /**
-     * The first identifier for which the bookId is true is made the bookId identifier.
-     * If no identifier has bookId == true then the first bookId identifier is written as the primary.
+     * The first identifier for which the bookId is true is made the bookId
+     * identifier. If no identifier has bookId == true then the first bookId
+     * identifier is written as the primary.
      *
      * @param identifiers
      * @return The first identifier for which the bookId is true is made the bookId identifier.
@@ -74,22 +76,22 @@ public class Identifier implements Serializable {
     public String getScheme() {
         return scheme;
     }
+
     public void setScheme(String scheme) {
         this.scheme = scheme;
     }
+
     public String getValue() {
         return value;
     }
+
     public void setValue(String value) {
         this.value = value;
     }
 
-    public void setBookId(boolean bookId) {
-        this.bookId = bookId;
-    }
-
     /**
-     * This bookId property allows the book creator to add multiple ids and tell the epubwriter which one to write out as the bookId.
+     * This bookId property allows the book creator to add multiple ids and tell
+     * the epubwriter which one to write out as the bookId.
      *
      * The Dublin Core metadata spec allows multiple identifiers for a Book.
      * The epub spec requires exactly one identifier to be marked as the book id.
@@ -100,22 +102,30 @@ public class Identifier implements Serializable {
         return bookId;
     }
 
+    public void setBookId(boolean bookId) {
+        this.bookId = bookId;
+    }
+
+    @Override
+    public boolean equals(Object otherIdentifier) {
+        if (this == otherIdentifier) {
+            return true;
+        }
+        if(!(otherIdentifier instanceof Identifier)) {
+            return false;
+        }
+        Identifier oi = (Identifier) otherIdentifier;
+        return StringUtil.equals(scheme, oi.scheme)
+            && StringUtil.equals(value, oi.value);
+    }
+
+    @Override
     public int hashCode() {
         return StringUtil.defaultIfNull(scheme).hashCode() ^ StringUtil.defaultIfNull(value).hashCode();
     }
 
-    public boolean equals(Object otherIdentifier) {
-        if(! (otherIdentifier instanceof Identifier)) {
-            return false;
-        }
-        return StringUtil.equals(scheme, ((Identifier) otherIdentifier).scheme)
-        && StringUtil.equals(value, ((Identifier) otherIdentifier).value);
-    }
-
+    @Override
     public String toString() {
-        if (StringUtil.isBlank(scheme)) {
-            return "" + value;
-        }
-        return "" + scheme + ":" + value;
+        return StringUtil.isNotBlank(scheme) ? scheme + ":" + value : value;
     }
 }

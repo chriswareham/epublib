@@ -104,7 +104,6 @@ public class PackageDocumentWriter implements PackageDocumentBase {
     private static List<Resource> getAllResourcesSortById(Book book) {
         List<Resource> allResources = new ArrayList<Resource>(book.getResources().getAll());
         Collections.sort(allResources, new Comparator<Resource>() {
-
             @Override
             public int compare(Resource resource1, Resource resource2) {
                 return resource1.getId().compareToIgnoreCase(resource2.getId());
@@ -154,7 +153,7 @@ public class PackageDocumentWriter implements PackageDocumentBase {
      * @throws IllegalArgumentException
      */
     private static void writeSpineItems(Spine spine, XmlSerializer serializer) throws IllegalArgumentException, IllegalStateException, IOException {
-        for(SpineReference spineReference: spine.getSpineReferences()) {
+        for (SpineReference spineReference: spine.getSpineReferences()) {
             serializer.startTag(NAMESPACE_OPF, OPFElements.ITEMREF);
             serializer.attribute(PackageDocumentBase.PREFIX_EMPTY, OPFAttributes.IDREF, spineReference.getResourceId());
             if (! spineReference.isLinear()) {
@@ -173,28 +172,25 @@ public class PackageDocumentWriter implements PackageDocumentBase {
         serializer.endTag(NAMESPACE_OPF, OPFElements.GUIDE);
     }
 
-    private static void ensureCoverPageGuideReferenceWritten(Guide guide,
-            EpubWriter epubWriter, XmlSerializer serializer) throws IllegalArgumentException, IllegalStateException, IOException {
-        if (! (guide.getGuideReferencesByType(GuideReference.COVER).isEmpty())) {
-            return;
-        }
-        Resource coverPage = guide.getCoverPage();
-        if (coverPage != null) {
-            writeGuideReference(new GuideReference(guide.getCoverPage(), GuideReference.COVER, GuideReference.COVER), serializer);
+    private static void ensureCoverPageGuideReferenceWritten(Guide guide, EpubWriter epubWriter, XmlSerializer serializer) throws IllegalArgumentException, IllegalStateException, IOException {
+        if (guide.getGuideReferencesByType(GuideReference.COVER).isEmpty()) {
+            Resource coverPage = guide.getCoverPage();
+            if (coverPage != null) {
+                writeGuideReference(new GuideReference(guide.getCoverPage(), GuideReference.COVER, GuideReference.COVER), serializer);
+            }
         }
     }
 
     private static void writeGuideReference(GuideReference reference, XmlSerializer serializer) throws IllegalArgumentException, IllegalStateException, IOException {
-        if (reference == null) {
-            return;
+        if (reference != null) {
+            serializer.startTag(NAMESPACE_OPF, OPFElements.REFERENCE);
+            serializer.attribute(PackageDocumentBase.PREFIX_EMPTY, OPFAttributes.TYPE, reference.getType());
+            serializer.attribute(PackageDocumentBase.PREFIX_EMPTY, OPFAttributes.HREF, reference.getCompleteHref());
+            if (StringUtil.isNotBlank(reference.getTitle())) {
+                serializer.attribute(PackageDocumentBase.PREFIX_EMPTY, OPFAttributes.TITLE, reference.getTitle());
+            }
+            serializer.endTag(NAMESPACE_OPF, OPFElements.REFERENCE);
         }
-        serializer.startTag(NAMESPACE_OPF, OPFElements.REFERENCE);
-        serializer.attribute(PackageDocumentBase.PREFIX_EMPTY, OPFAttributes.TYPE, reference.getType());
-        serializer.attribute(PackageDocumentBase.PREFIX_EMPTY, OPFAttributes.HREF, reference.getCompleteHref());
-        if (StringUtil.isNotBlank(reference.getTitle())) {
-            serializer.attribute(PackageDocumentBase.PREFIX_EMPTY, OPFAttributes.TITLE, reference.getTitle());
-        }
-        serializer.endTag(NAMESPACE_OPF, OPFElements.REFERENCE);
     }
 
     private PackageDocumentWriter() {
