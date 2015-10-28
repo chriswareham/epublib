@@ -30,16 +30,16 @@ import org.apache.commons.vfs.VFS;
  * @author paul
  *
  */
-public class FilesetBookCreator {
+public final class FilesetBookCreator {
 
-    private static Comparator<FileObject> fileComparator = new Comparator<FileObject>(){
+    private static final Comparator<FileObject> FILE_COMPARATOR = new Comparator<FileObject>(){
         @Override
         public int compare(FileObject o1, FileObject o2) {
             return o1.getName().getBaseName().compareToIgnoreCase(o2.getName().getBaseName());
         }
     };
 
-    private static final BookProcessor bookProcessor = new DefaultBookProcessorPipeline();
+    private static final BookProcessor BOOK_PROCESSOR = new DefaultBookProcessorPipeline();
 
     public static Book createBookFromDirectory(File rootDirectory) throws IOException {
         return createBookFromDirectory(rootDirectory, Constants.CHARACTER_ENCODING);
@@ -57,14 +57,15 @@ public class FilesetBookCreator {
     /**
      * Recursively adds all files that are allowed to be part of an epub to the Book.
      *
-     * @see nl.siegmann.epublib.domain.MediaTypeService
+     * @param encoding
      * @param rootDirectory
      * @return the newly created Book
      * @throws IOException
+     * @see nl.siegmann.epublib.domain.MediaTypeService
      */
     public static Book createBookFromDirectory(FileObject rootDirectory, String encoding) throws IOException {
         Book result = new Book();
-        List<TOCReference> sections = new ArrayList<TOCReference>();
+        List<TOCReference> sections = new ArrayList<>();
         Resources resources = new Resources();
         processDirectory(rootDirectory, rootDirectory, sections, resources, encoding);
         result.setResources(resources);
@@ -72,21 +73,18 @@ public class FilesetBookCreator {
         result.setTableOfContents(tableOfContents);
         result.setSpine(new Spine(tableOfContents));
 
-        result = bookProcessor.processBook(result);
+        result = BOOK_PROCESSOR.processBook(result);
 
         return result;
     }
 
     private static void processDirectory(FileObject rootDir, FileObject directory, List<TOCReference> sections, Resources resources, String inputEncoding) throws IOException {
         FileObject[] files = directory.getChildren();
-        Arrays.sort(files, fileComparator);
-        for(int i = 0; i < files.length; i++) {
-            FileObject file = files[i];
+        Arrays.sort(files, FILE_COMPARATOR);
+        for (FileObject file : files) {
             if(file.getType() == FileType.FOLDER) {
                 processSubdirectory(rootDir, file, sections, resources, inputEncoding);
-            } else if (MediatypeService.determineMediaType(file.getName().getBaseName()) == null) {
-                continue;
-            } else {
+            } else if (MediatypeService.getMediaTypeByFilename(file.getName().getBaseName()) != null) {
                 Resource resource = VFSUtil.createResource(rootDir, file, inputEncoding);
                 if(resource == null) {
                     continue;
@@ -103,7 +101,7 @@ public class FilesetBookCreator {
     private static void processSubdirectory(FileObject rootDir, FileObject file,
             List<TOCReference> sections, Resources resources, String inputEncoding)
             throws IOException {
-        List<TOCReference> childTOCReferences = new ArrayList<TOCReference>();
+        List<TOCReference> childTOCReferences = new ArrayList<>();
         processDirectory(rootDir, file, childTOCReferences, resources, inputEncoding);
         if(! childTOCReferences.isEmpty()) {
             String sectionName = file.getName().getBaseName();
@@ -115,4 +113,7 @@ public class FilesetBookCreator {
         }
     }
 
+    private FilesetBookCreator() {
+        super();
+    }
 }

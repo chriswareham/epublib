@@ -27,7 +27,7 @@ public class EpubReaderTest {
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
 		(new EpubWriter()).write(book, out);
 		byte[] epubData = out.toByteArray();
-		Book readBook = new EpubReader().readEpub(new ByteArrayInputStream(
+		Book readBook = new EpubReader().read(new ByteArrayInputStream(
 				epubData));
 		Assert.assertNotNull(readBook.getCoverImage());
 	}
@@ -45,7 +45,7 @@ public class EpubReaderTest {
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
 		(new EpubWriter()).write(book, out);
 		byte[] epubData = out.toByteArray();
-		Book readBook = new EpubReader().readEpub(new ByteArrayInputStream(
+		Book readBook = new EpubReader().read(new ByteArrayInputStream(
 				epubData));
 		Assert.assertNotNull(readBook.getCoverPage());
 		Assert.assertEquals(1, readBook.getSpine().size());
@@ -65,7 +65,7 @@ public class EpubReaderTest {
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
 		(new EpubWriter()).write(book, out);
 		byte[] epubData = out.toByteArray();
-		Book readBook = new EpubReader().readEpub(new ByteArrayInputStream(
+		Book readBook = new EpubReader().read(new ByteArrayInputStream(
 				epubData));
 		Assert.assertNotNull(readBook.getCoverPage());
 		Assert.assertEquals(1, readBook.getSpine().size());

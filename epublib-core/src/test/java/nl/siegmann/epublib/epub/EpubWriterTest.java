@@ -1,9 +1,5 @@
 package nl.siegmann.epublib.epub;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -18,6 +14,7 @@ import nl.siegmann.epublib.domain.GuideReference;
 import nl.siegmann.epublib.domain.Identifier;
 import nl.siegmann.epublib.domain.Resource;
 import nl.siegmann.epublib.domain.TOCReference;
+import nl.siegmann.epublib.domain.Title;
 import nl.siegmann.epublib.util.CollectionUtil;
 
 import org.junit.Assert;
@@ -40,7 +37,7 @@ public class EpubWriterTest {
 		Assert.assertTrue(bookData.length > 0);
 		
 		// read book from byte[]
-		Book readBook = new EpubReader().readEpub(new ByteArrayInputStream(bookData));
+		Book readBook = new EpubReader().read(new ByteArrayInputStream(bookData));
 		
 		// assert book values are correct
 		Assert.assertEquals(book.getMetadata().getTitles(), readBook.getMetadata().getTitles());
@@ -63,7 +60,7 @@ public class EpubWriterTest {
 	 */
 	public void testWritingBookWithCoverWithNullId() throws FileNotFoundException, IOException {
 		Book book = new Book();
-	    book.getMetadata().addTitle("Epub test book 1");
+	    book.getMetadata().addTitle(new Title("Epub test book 1"));
 	    book.getMetadata().addAuthor(new Author("Joe", "Tester"));
 	    InputStream is = this.getClass().getResourceAsStream("/book1/cover.png");
 	    book.setCoverImage(new Resource(is, "cover.png"));
@@ -78,8 +75,8 @@ public class EpubWriterTest {
 	private Book createTestBook() throws IOException {
 		Book book = new Book();
 		
-		book.getMetadata().addTitle("Epublib test book 1");
-		book.getMetadata().addTitle("test2");
+		book.getMetadata().addTitle(new Title("Epublib test book 1"));
+		book.getMetadata().addTitle(new Title("test2"));
 		
 		book.getMetadata().addIdentifier(new Identifier(Identifier.Scheme.ISBN, "987654321"));
 		book.getMetadata().addAuthor(new Author("Joe", "Tester"));

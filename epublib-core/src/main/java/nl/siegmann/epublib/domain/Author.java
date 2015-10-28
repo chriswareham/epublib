@@ -1,28 +1,34 @@
 package nl.siegmann.epublib.domain;
 
-import java.io.Serializable;
-
 import nl.siegmann.epublib.util.StringUtil;
 
 /**
- * Represents one of the authors of the book
+ * This DCMES Optional Element is used to represent the name of a person,
+ * organisation, etc.
  *
- * @author paul
+ * @author Paul Siegmann
+ * @author Chris Wareham
  *
+ * @see <a href="http://www.idpf.org/epub/30/spec/epub30-publications.html#sec-opf-dcmes-optional">The DCMES Optional Elements</a>
  */
-public class Author implements Serializable {
+public class Author extends AbstractDublinCoreElement {
+    /**
+     * The serial version UID.
+     */
+    private static final long serialVersionUID = 1L;
 
-    private static final long serialVersionUID = 6663408501416574200L;
-
-    private String firstname;
-    private String lastname;
     private Relator relator = Relator.AUTHOR;
 
-    public Author(String singleName) {
+    private String firstname;
+
+    private String lastname;
+
+    public Author(final String singleName) {
         this("", singleName);
     }
 
-    public Author(String firstname, String lastname) {
+    public Author(final String firstname, final String lastname) {
+        super(null, null, TextDirection.UNSPECIFIED);
         this.firstname = firstname;
         this.lastname = lastname;
     }
@@ -30,39 +36,25 @@ public class Author implements Serializable {
     public String getFirstname() {
         return firstname;
     }
-    public void setFirstname(String firstname) {
+
+    public void setFirstname(final String firstname) {
         this.firstname = firstname;
     }
+
     public String getLastname() {
         return lastname;
     }
-    public void setLastname(String lastname) {
+
+    public void setLastname(final String lastname) {
         this.lastname = lastname;
     }
 
-    public String toString() {
-        return lastname + ", " + firstname;
-    }
-
-    public int hashCode() {
-        return StringUtil.hashCode(firstname, lastname);
-    }
-
-    public boolean equals(Object authorObject) {
-        if(! (authorObject instanceof Author)) {
-            return false;
-        }
-        Author other = (Author) authorObject;
-        return StringUtil.equals(firstname, other.firstname)
-         && StringUtil.equals(lastname, other.lastname);
-    }
-
-    public Relator setRole(String code) {
+    public Relator setRole(final String code) {
         Relator result = Relator.byCode(code);
         if (result == null) {
             result = Relator.AUTHOR;
         }
-        this.relator = result;
+        relator = result;
         return result;
     }
 
@@ -70,7 +62,30 @@ public class Author implements Serializable {
         return relator;
     }
 
-    public void setRelator(Relator relator) {
+    public void setRelator(final Relator relator) {
         this.relator = relator;
+    }
+
+    @Override
+    public String toString() {
+        return lastname + ", " + firstname;
+    }
+
+    @Override
+    public boolean equals(final Object obj) {
+        if (obj == this) {
+            return true;
+        }
+        if(!(obj instanceof Author)) {
+            return false;
+        }
+        Author author = (Author) obj;
+        return StringUtil.equals(firstname, author.firstname)
+            && StringUtil.equals(lastname, author.lastname);
+    }
+
+    @Override
+    public int hashCode() {
+        return StringUtil.hashCode(firstname, lastname);
     }
 }

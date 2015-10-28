@@ -17,17 +17,17 @@ import org.apache.commons.vfs.VFS;
 import org.slf4j.Logger;import org.slf4j.LoggerFactory;
 
 /**
- * Utitilies for making working with apache commons VFS easier.
+ * Utilities for making working with apache commons VFS easier.
  *
  * @author paul
  *
  */
-public class VFSUtil {
+public final class VFSUtil {
 
     private static final Logger log = LoggerFactory.getLogger(VFSUtil.class);
 
     public static Resource createResource(FileObject rootDir, FileObject file, String inputEncoding) throws IOException {
-        MediaType mediaType = MediatypeService.determineMediaType(file.getName().getBaseName());
+        MediaType mediaType = MediatypeService.getMediaTypeByFilename(file.getName().getBaseName());
         if(mediaType == null) {
             return null;
         }
@@ -84,5 +84,9 @@ public class VFSUtil {
             }
         }
         return result;
+    }
+
+    private VFSUtil() {
+        super();
     }
 }

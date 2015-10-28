@@ -5,7 +5,7 @@
 
     <modelVersion>4.0.0</modelVersion>
 
-    <name>Checkstyle</name>
+    <name>EPUBlib Checkstyle</name>
 
     <artifactId>epublib-checkstyle</artifactId>
     <packaging>jar</packaging>

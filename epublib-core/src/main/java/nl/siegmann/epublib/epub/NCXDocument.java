@@ -88,7 +88,7 @@ public class NCXDocument {
                 return ncxResource;
             }
             Document ncxDocument = ResourceUtil.getAsDocument(ncxResource);
-            Element navMapElement = DOMUtil.getFirstElementByTagNameNS(ncxDocument.getDocumentElement(), NAMESPACE_NCX, NCXTags.navMap);
+            Element navMapElement = DOMUtil.getFirstElement(ncxDocument.getDocumentElement(), NAMESPACE_NCX, NCXTags.navMap);
             TableOfContents tableOfContents = new TableOfContents(readTOCReferences(navMapElement.getChildNodes(), book));
             book.setTableOfContents(tableOfContents);
         } catch (Exception e) {
@@ -138,8 +138,8 @@ public class NCXDocument {
     }
 
     private static String readNavReference(Element navpointElement) {
-        Element contentElement = DOMUtil.getFirstElementByTagNameNS(navpointElement, NAMESPACE_NCX, NCXTags.content);
-        String result = DOMUtil.getAttribute(contentElement, NAMESPACE_NCX, NCXAttributes.src);
+        Element contentElement = DOMUtil.getFirstElement(navpointElement, NAMESPACE_NCX, NCXTags.content);
+        String result = DOMUtil.getAttributeValue(contentElement, NAMESPACE_NCX, NCXAttributes.src);
         try {
             result = URLDecoder.decode(result, Constants.CHARACTER_ENCODING);
         } catch (UnsupportedEncodingException e) {
@@ -149,8 +149,8 @@ public class NCXDocument {
     }
 
     private static String readNavLabel(Element navpointElement) {
-        Element navLabel = DOMUtil.getFirstElementByTagNameNS(navpointElement, NAMESPACE_NCX, NCXTags.navLabel);
-        return DOMUtil.getTextChildrenContent(DOMUtil.getFirstElementByTagNameNS(navLabel, NAMESPACE_NCX, NCXTags.text));
+        Element navLabel = DOMUtil.getFirstElement(navpointElement, NAMESPACE_NCX, NCXTags.navLabel);
+        return DOMUtil.getElementTextContent(DOMUtil.getFirstElement(navLabel, NAMESPACE_NCX, NCXTags.text));
     }
 
     public static void write(EpubWriter epubWriter, Book book, ZipOutputStream resultStream) throws IOException {

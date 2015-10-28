@@ -34,7 +34,7 @@ public class ResourceUtil {
         if (file == null) {
             return null;
         }
-        MediaType mediaType = MediatypeService.determineMediaType(file.getName());
+        MediaType mediaType = MediatypeService.getMediaTypeByFilename(file.getName());
         byte[] data = IOUtil.toByteArray(new FileInputStream(file));
         Resource result = new Resource(data, mediaType);
         return result;

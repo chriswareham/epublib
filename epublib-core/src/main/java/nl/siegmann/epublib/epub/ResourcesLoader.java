@@ -87,7 +87,7 @@ public class ResourcesLoader {
         if (CollectionUtil.isEmpty(lazilyLoadedMediaTypes)) {
             return false;
         }
-        MediaType mediaType = MediatypeService.determineMediaType(href);
+        MediaType mediaType = MediatypeService.getMediaTypeByFilename(href);
         return lazilyLoadedMediaTypes.contains(mediaType);
     }
 

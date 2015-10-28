@@ -39,7 +39,7 @@ public class LazyResource extends Resource {
      * @param href The resource's href within the epub.
      */
     public LazyResource(String filename, long size, String href) {
-        super( null, null, href, MediatypeService.determineMediaType(href));
+        super( null, null, href, MediatypeService.getMediaTypeByFilename(href));
         this.filename = filename;
         this.cachedSize = size;
     }
@@ -60,7 +60,7 @@ public class LazyResource extends Resource {
      * @throws IOException
      */
     public LazyResource(InputStream in, String filename, int length, String href) throws IOException {
-        super(null, IOUtil.toByteArray(in, length), href, MediatypeService.determineMediaType(href));
+        super(null, IOUtil.toByteArray(in, length), href, MediatypeService.getMediaTypeByFilename(href));
         this.filename = filename;
         this.cachedSize = length;
     }

@@ -28,9 +28,10 @@ import org.apache.commons.vfs.FileType;
  * @author paul
  *
  */
-public class ChmParser {
+public final class ChmParser {
 
     public static final String DEFAULT_CHM_HTML_INPUT_ENCODING = "windows-1252";
+
     public static final int MINIMAL_SYSTEM_TITLE_LENGTH = 4;
 
     public static Book parseChm(FileObject chmRootDir) throws XPathExpressionException, IOException, ParserConfigurationException {
@@ -65,7 +66,7 @@ public class ChmParser {
      * @return Finds in the '#SYSTEM' file the 3rd set of characters that have ascii value &gt;= 32 and &gt;= 126 and is more than 3 characters long.
      * @throws IOException
      */
-    protected static String findTitle(FileObject chmRootDir) throws IOException {
+    public static String findTitle(FileObject chmRootDir) throws IOException {
         FileObject systemFileObject = chmRootDir.resolveFile("#SYSTEM");
         InputStream in = systemFileObject.getContent().getInputStream();
         boolean inText = false;
@@ -93,9 +94,9 @@ public class ChmParser {
 
     private static FileObject findHhcFileObject(FileObject chmRootDir) throws FileSystemException {
         FileObject[] files = chmRootDir.getChildren();
-        for(int i = 0; i < files.length; i++) {
-            if("hhc".equalsIgnoreCase(files[i].getName().getExtension())) {
-                return files[i];
+        for (FileObject file : files) {
+            if ("hhc".equalsIgnoreCase(file.getName().getExtension())) {
+                return file;
             }
         }
         return null;
@@ -104,12 +105,11 @@ public class ChmParser {
     private static Resources findResources(FileObject rootDir, String inputEncoding) throws IOException {
         Resources result = new Resources();
         FileObject[] allFiles = rootDir.findFiles(new AllFileSelector());
-        for(int i = 0; i < allFiles.length; i++) {
-            FileObject file = allFiles[i];
+        for (FileObject file : allFiles) {
             if (file.getType() == FileType.FOLDER) {
                 continue;
             }
-            MediaType mediaType = MediatypeService.determineMediaType(file.getName().getBaseName());
+            MediaType mediaType = MediatypeService.getMediaTypeByFilename(file.getName().getBaseName());
             if(mediaType == null) {
                 continue;
             }
@@ -122,5 +122,8 @@ public class ChmParser {
             result.add(fileResource);
         }
         return result;
+    }
+
+    private ChmParser() {
     }
 }

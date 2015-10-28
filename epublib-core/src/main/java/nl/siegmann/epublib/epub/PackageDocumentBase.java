@@ -1,19 +1,45 @@
 package nl.siegmann.epublib.epub;
 
 /**
- * Functionality shared by the PackageDocumentReader and the PackageDocumentWriter
- *
- * @author paul
+ * This interface describes constants for EPUB 3.0 Package Documents.
  */
 public interface PackageDocumentBase {
-    String BOOK_ID = "BookId";
+    /**
+     * The EPUB version.
+     */
+    String VERSION = "3.0";
+    /**
+     * The Open Package Format namespace.
+     */
     String NAMESPACE_OPF = "http://www.idpf.org/2007/opf";
+    /**
+     * The Dublin Core namespace.
+     */
     String NAMESPACE_DUBLIN_CORE = "http://purl.org/dc/elements/1.1/";
-    String PREFIX_DUBLIN_CORE = "dc";
+    /**
+     * The Open Package Format prefix.
+     */
     String PREFIX_OPF = "opf";
+    /**
+     * The Dublin Core prefix.
+     */
+    String PREFIX_DUBLIN_CORE = "dc";
+    /**
+     * The empty prefix.
+     */
     String PREFIX_EMPTY = "";
+    /**
+     * The <code>id</code> of the primary identifier of an EPUB Publication.
+     */
+    String BOOK_ID = "BookId";
+    /**
+     * The format for Package Document dates.
+     */
     String DATE_FORMAT = "yyyy-MM-dd";
 
+    /**
+     * The Dublin Core elements.
+     */
     public interface DCElements {
         String TITLE = "title";
         String CREATOR = "creator";
@@ -32,11 +58,17 @@ public interface PackageDocumentBase {
         String RIGHTS = "rights";
     }
 
+    /**
+     * The Dublin Core attributes.
+     */
     public interface DCAttributes {
         String SCHEME = "scheme";
         String ID = "id";
     }
 
+    /**
+     * The Open Packaging Format elements.
+     */
     public interface OPFElements {
         String METADATA = "metadata";
         String META = "meta";
@@ -47,8 +79,12 @@ public interface PackageDocumentBase {
         String REFERENCE = "reference";
         String GUIDE = "guide";
         String ITEM = "item";
+        String LINK = "link";
     }
 
+    /**
+     * The Open Packaging Format attributes.
+     */
     public interface OPFAttributes {
         String UNIQUE_IDENTIFIER = "unique-identifier";
         String IDREF = "idref";
@@ -67,8 +103,13 @@ public interface PackageDocumentBase {
         String VERSION = "version";
         String SCHEME = "scheme";
         String PROPERTY = "property";
+        String PROPERTIES = "properties";
+        String REL = "rel";
     }
 
+    /**
+     * The Open Packaging Format values.
+     */
     public interface OPFValues {
         String META_COVER = "cover";
         String REFERENCE_COVER = "cover";

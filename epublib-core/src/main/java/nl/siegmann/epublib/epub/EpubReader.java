@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipInputStream;
 
+import javax.xml.parsers.ParserConfigurationException;
+
 import nl.siegmann.epublib.Constants;
 import nl.siegmann.epublib.domain.Book;
 import nl.siegmann.epublib.domain.MediaType;
@@ -16,144 +18,226 @@ import nl.siegmann.epublib.service.MediatypeService;
 import nl.siegmann.epublib.util.ResourceUtil;
 import nl.siegmann.epublib.util.StringUtil;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+import org.xml.sax.SAXException;
+
 /**
- * Reads an epub file.
- *
- * @author paul
- *
+ * This class provides a reader for the container contents of an EPUB 3.0
+ * Publication.
  */
-public class EpubReader {
-
-    private final static Logger LOGGER = LoggerFactory.getLogger(EpubReader.class);
-
+public class EpubReader implements EpubBase {
+    /**
+     * The book post-processor.
+     */
     private BookProcessor bookProcessor;
 
+    /**
+     * Create a reader for the container contents of an EPUB 3.0 Publication.
+     */
     public EpubReader() {
         this(BookProcessor.IDENTITY_BOOKPROCESSOR);
     }
 
+    /**
+     * Create a reader for the container contents of an EPUB 3.0 Publication.
+     *
+     * @param bookProcessor the book post-processor
+     */
     public EpubReader(final BookProcessor bookProcessor) {
         this.bookProcessor = bookProcessor;
     }
 
-    public Book readEpub(InputStream in) throws IOException {
-        return readEpub(in, Constants.CHARACTER_ENCODING);
-    }
-
-    public Book readEpub(ZipInputStream in) throws IOException {
-        return readEpub(in, Constants.CHARACTER_ENCODING);
-    }
-
-    public Book readEpub(ZipFile zipfile) throws IOException {
-        return readEpub(zipfile, Constants.CHARACTER_ENCODING);
+    /**
+     * Get the book post-processor.
+     *
+     * @return the book post-processor
+     */
+    public BookProcessor getBookProcessor() {
+        return bookProcessor;
     }
 
     /**
-     * Read epub from inputstream
+     * Set the book post-processor.
      *
-     * @param in the inputstream from which to read the epub
-     * @param encoding the encoding to use for the html files within the epub
-     * @return the Book as read from the inputstream
-     * @throws IOException
+     * @param bookProcessor the book post-processor
      */
-    public Book readEpub(InputStream in, String encoding) throws IOException {
-        return readEpub(new ZipInputStream(in), encoding);
+    public void setBookProcessor(final BookProcessor bookProcessor) {
+        this.bookProcessor = bookProcessor;
     }
 
     /**
-     * Reads this EPUB without loading any resources into memory.
+     * Read the container contents of an EPUB 3.0 Publication.
      *
-     * @param fileName the file to load
-     * @param encoding the encoding for XHTML files
-     *
-     * @return this Book without loading all resources into memory.
-     * @throws IOException
+     * @param in the input stream to read the container contents from
+     * @return the book describing the container contents
+     * @throws IOException if an I/O error occurs
      */
-    public Book readEpubLazy(ZipFile zipFile, String encoding ) throws IOException {
-        return readEpubLazy(zipFile, encoding, Arrays.asList(MediatypeService.MEDIA_TYPES) );
-    }
-
-    public Book readEpub(ZipInputStream in, String encoding) throws IOException {
-        return readEpub(ResourcesLoader.loadResources(in, encoding));
-    }
-
-    public Book readEpub(ZipFile in, String encoding) throws IOException {
-        return readEpub(ResourcesLoader.loadResources(in, encoding));
+    public Book read(final InputStream in) throws IOException {
+        return read(in, Constants.CHARACTER_ENCODING);
     }
 
     /**
-     * Reads this EPUB without loading all resources into memory.
+     * Read the container contents of an EPUB 3.0 Publication.
      *
-     * @param fileName the file to load
-     * @param encoding the encoding for XHTML files
-     * @param lazyLoadedTypes a list of the MediaType to load lazily
-     * @return this Book without loading all resources into memory.
-     * @throws IOException
+     * @param in the input stream to read the container contents from
+     * @return the book describing the container contents
+     * @throws IOException if an I/O error occurs
      */
-    public Book readEpubLazy(ZipFile zipFile, String encoding, List<MediaType> lazyLoadedTypes ) throws IOException {
-        Resources resources = ResourcesLoader.loadResources(zipFile, encoding, lazyLoadedTypes);
-        return readEpub(resources);
+    public Book read(final ZipInputStream in) throws IOException {
+        return read(in, Constants.CHARACTER_ENCODING);
     }
 
-    public Book readEpub(Resources resources) throws IOException{
-        return readEpub(resources, new Book());
+    /**
+     * Read the container contents of an EPUB 3.0 Publication.
+     *
+     * @param file the file to read the container contents from
+     * @return the book describing the container contents
+     * @throws IOException if an I/O error occurs
+     */
+    public Book read(final ZipFile file) throws IOException {
+        return read(file, Constants.CHARACTER_ENCODING);
     }
 
-    public Book readEpub(Resources resources, Book result) throws IOException{
-        handleMimeType(result, resources);
+    /**
+     * Read the container contents of an EPUB 3.0 Publication.
+     *
+     * @param in the input stream to read the container contents from
+     * @param encoding the encoding for XHTML resources in the container contents
+     * @return the book describing the container contents
+     * @throws IOException if an I/O error occurs
+     */
+    public Book read(final InputStream in, final String encoding) throws IOException {
+        return read(ResourcesLoader.loadResources(new ZipInputStream(in), encoding));
+    }
+
+    /**
+     * Read the container contents of an EPUB 3.0 Publication.
+     *
+     * @param in the input stream to read the container contents from
+     * @param encoding the encoding for XHTML resources in the container contents
+     * @return the book describing the container contents
+     * @throws IOException if an I/O error occurs
+     */
+    public Book read(final ZipInputStream in, final String encoding) throws IOException {
+        return read(ResourcesLoader.loadResources(in, encoding));
+    }
+
+    /**
+     * Read the container contents of an EPUB 3.0 Publication.
+     *
+     * @param file the file to read the container contents from
+     * @param encoding the encoding for XHTML resources in the container contents
+     * @return the book describing the container contents
+     * @throws IOException if an I/O error occurs
+     */
+    public Book read(final ZipFile file, final String encoding) throws IOException {
+        return read(ResourcesLoader.loadResources(file, encoding));
+    }
+
+    /**
+     * Read the container contents of an EPUB 3.0 Publication, without loading
+     * resource data.
+     *
+     * @param file the file to read the container contents from
+     * @param encoding the encoding for XHTML resources in the container contents
+     * @return the book describing the container contents
+     * @throws IOException if an I/O error occurs
+     */
+    public Book readLazy(final ZipFile file, final String encoding) throws IOException {
+        return readLazy(file, encoding, Arrays.asList(MediatypeService.MEDIA_TYPES));
+    }
+
+    /**
+     * Read the container contents of an EPUB 3.0 Publication, without loading
+     * resource data.
+     *
+     * @param file the file to read the container contents from
+     * @param encoding the encoding for XHTML resources in the container contents
+     * @param lazyLoadedTypes the media types of the resources to not load the data for
+     * @return the book describing the container contents
+     * @throws IOException if an I/O error occurs
+     */
+    public Book readLazy(final ZipFile file, final String encoding, final List<MediaType> lazyLoadedTypes) throws IOException {
+        return read(ResourcesLoader.loadResources(file, encoding, lazyLoadedTypes));
+    }
+
+    /**
+     * Read the container contents of an EPUB 3.0 Publication.
+     *
+     * @param resources the resources for the publication
+     * @return the book describing the container contents
+     * @throws IOException if an I/O error occurs
+     */
+    public Book read(final Resources resources) throws IOException {
+        return read(resources, new Book());
+    }
+
+    /**
+     * Read the container contents of an EPUB 3.0 Publication.
+     *
+     * @param resources the resources for the publication
+     * @param book the book to populate with the container contents
+     * @return the book describing the container contents
+     * @throws IOException if an I/O error occurs
+     */
+    public Book read(final Resources resources, final Book book) throws IOException {
+        resources.remove(FILE_NAME_MIMETYPE);
         String packageResourceHref = getPackageResourceHref(resources);
-        Resource packageResource = processPackageResource(packageResourceHref, result, resources);
-        result.setOpfResource(packageResource);
-        Resource ncxResource = processNcxResource(packageResource, result);
-        result.setNcxResource(ncxResource);
-        return postProcessBook(result);
+        Resource packageResource = processPackageResource(packageResourceHref, book, resources);
+        book.setOpfResource(packageResource);
+        Resource ncxResource = processNcxResource(book);
+        book.setNcxResource(ncxResource);
+        return postProcessBook(book);
     }
 
+    /**
+     * Post-process a book.
+     *
+     * @param book the book to post-process
+     * @return the post-processed book
+     */
     private Book postProcessBook(final Book book) {
         return bookProcessor != null ? bookProcessor.processBook(book) : book;
     }
 
-    private Resource processNcxResource(Resource packageResource, Book book) {
+    private Resource processNcxResource(final Book book) {
         return NCXDocument.read(book, this);
     }
 
-    private Resource processPackageResource(String packageResourceHref, Book book, Resources resources) {
-        Resource packageResource = resources.remove(packageResourceHref);
+    private String getPackageResourceHref(final Resources resources) throws IOException {
         try {
-            PackageDocumentReader.read(packageResource, this, book, resources);
-        } catch (Exception e) {
-            LOGGER.error(e.getMessage(), e);
-        }
-        return packageResource;
-    }
-
-    private String getPackageResourceHref(Resources resources) {
-        String defaultResult = "OEBPS/content.opf";
-        String result = defaultResult;
-
-        Resource containerResource = resources.remove("META-INF/container.xml");
-        if(containerResource == null) {
-            return result;
-        }
-        try {
+            String defaultResult = DIR_NAME_OEBPS + PATH_SEPARATOR + FILE_NAME_CONTENT_OPF;
+            String result = defaultResult;
+            Resource containerResource = resources.remove(DIR_NAME_META_INF + PATH_SEPARATOR + FILE_NAME_CONTAINER_XML);
+            if(containerResource == null) {
+                return result;
+            }
             Document document = ResourceUtil.getAsDocument(containerResource);
             Element rootFileElement = (Element) ((Element) document.getDocumentElement().getElementsByTagName("rootfiles").item(0)).getElementsByTagName("rootfile").item(0);
             result = rootFileElement.getAttribute("full-path");
-        } catch (Exception e) {
-            LOGGER.error(e.getMessage(), e);
+            if(StringUtil.isBlank(result)) {
+                result = defaultResult;
+            }
+            return result;
+        } catch (ParserConfigurationException | SAXException e) {
+            throw new IOException("Failed to read package resource href", e);
         }
-        if(StringUtil.isBlank(result)) {
-            result = defaultResult;
-        }
-        return result;
     }
 
-    private void handleMimeType(Book result, Resources resources) {
-        resources.remove("mimetype");
+    /**
+     * Process a package resource.
+     *
+     * @param packageResourceHref the package resource link
+     * @param book the container contents
+     * @param resources the resources
+     * @return the package resource
+     * @throws IOException if an I/O error occurs
+     */
+    public Resource processPackageResource(final String packageResourceHref, final Book book, final Resources resources) throws IOException {
+        Resource packageResource = resources.remove(packageResourceHref);
+        PackageDocumentReader.read(packageResource, book, resources);
+        return packageResource;
     }
 }

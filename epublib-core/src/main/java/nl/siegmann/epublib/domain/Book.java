@@ -513,5 +513,21 @@ public class Book implements Serializable {
     public Resource getNcxResource() {
         return ncxResource;
     }
+
+    public boolean isNcx() {
+        return true;
+    }
+
+    public String getNcxId() {
+        return "ncx";
+    }
+
+    public String getNcxHref() {
+        return "toc.ncx";
+    }
+
+    public String getNcxMediaType() {
+        return "application/x-dtbncx+xml";
+    }
 }
 

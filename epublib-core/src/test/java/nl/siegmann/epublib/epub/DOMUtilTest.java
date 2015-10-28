@@ -24,7 +24,7 @@ public class DOMUtilTest {
 				Document document = EpubProcessorSupport.createDocumentBuilder().parse(new InputSource(new StringReader(input)));
 				
 				// when
-				String actualResult = DOMUtil.getAttribute(document.getDocumentElement(), "foo", "myattr");
+				String actualResult = DOMUtil.getAttributeValue(document.getDocumentElement(), "foo", "myattr");
 				
 				// then
 				assertEquals("red", actualResult);
@@ -42,7 +42,7 @@ public class DOMUtilTest {
 				Document document = EpubProcessorSupport.createDocumentBuilder().parse(new InputSource(new StringReader(input)));
 				
 				// when
-				String actualResult = DOMUtil.getAttribute(document.getDocumentElement(), "bar", "myattr");
+				String actualResult = DOMUtil.getAttributeValue(document.getDocumentElement(), "bar", "myattr");
 				
 				// then
 				assertEquals("green", actualResult);

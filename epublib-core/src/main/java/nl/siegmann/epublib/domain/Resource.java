@@ -22,9 +22,14 @@ import nl.siegmann.epublib.util.commons.io.XmlStreamReader;
 public class Resource implements Serializable {
 
     /**
-     *
+     * The serial version UID.
      */
-    private static final long serialVersionUID = 1043946707835004037L;
+    private static final long serialVersionUID = 1L;
+
+    /**
+     * The space-separated list of property values.
+     */
+    private String properties;
     private String id;
     private String title;
     private String href;
@@ -41,7 +46,7 @@ public class Resource implements Serializable {
      * @param href The location of the resource within the epub. Example: "chapter1.html".
      */
     public Resource(String href) {
-        this(null, new byte[0], href, MediatypeService.determineMediaType(href));
+        this(null, new byte[0], href, MediatypeService.getMediaTypeByFilename(href));
     }
 
     /**
@@ -63,33 +68,33 @@ public class Resource implements Serializable {
      *
      * Assumes that if the data is of a text type (html/css/etc) then the encoding will be UTF-8
      *
-     * @see nl.siegmann.epublib.service.MediatypeService#determineMediaType(String)
+     * @see nl.siegmann.epublib.service.MediatypeService#getMediaTypeByFilename(String)
      *
      * @param data The Resource's contents
      * @param href The location of the resource within the epub. Example: "chapter1.html".
      */
     public Resource(byte[] data, String href) {
-        this(null, data, href, MediatypeService.determineMediaType(href), Constants.CHARACTER_ENCODING);
+        this(null, data, href, MediatypeService.getMediaTypeByFilename(href), Constants.CHARACTER_ENCODING);
     }
 
     /**
      * Creates a resource with the data from the given Reader at the specified href.
      * The MediaType will be determined based on the href extension.
      *
-     * @see nl.siegmann.epublib.service.MediatypeService#determineMediaType(String)
+     * @see nl.siegmann.epublib.service.MediatypeService#getMediaTypeByFilename(String)
      *
      * @param in The Resource's contents
      * @param href The location of the resource within the epub. Example: "cover.jpg".
      */
     public Resource(Reader in, String href) throws IOException {
-        this(null, IOUtil.toByteArray(in, Constants.CHARACTER_ENCODING), href, MediatypeService.determineMediaType(href), Constants.CHARACTER_ENCODING);
+        this(null, IOUtil.toByteArray(in, Constants.CHARACTER_ENCODING), href, MediatypeService.getMediaTypeByFilename(href), Constants.CHARACTER_ENCODING);
     }
 
     /**
      * Creates a resource with the data from the given InputStream at the specified href.
      * The MediaType will be determined based on the href extension.
      *
-     * @see nl.siegmann.epublib.service.MediatypeService#determineMediaType(String)
+     * @see nl.siegmann.epublib.service.MediatypeService#getMediaTypeByFilename(String)
      *
      * Assumes that if the data is of a text type (html/css/etc) then the encoding will be UTF-8
      *
@@ -102,7 +107,7 @@ public class Resource implements Serializable {
      * @param href The location of the resource within the epub. Example: "cover.jpg".
      */
     public Resource(InputStream in, String href) throws IOException {
-        this(null, IOUtil.toByteArray(in), href, MediatypeService.determineMediaType(href));
+        this(null, IOUtil.toByteArray(in), href, MediatypeService.getMediaTypeByFilename(href));
     }
 
     /**
@@ -135,6 +140,24 @@ public class Resource implements Serializable {
         this.mediaType = mediaType;
         this.inputEncoding = inputEncoding;
         this.data = data;
+    }
+
+    /**
+     * Get the space-separated list of property values.
+     *
+     * @return the space-separated list of property values
+     */
+    public String getProperties() {
+        return properties;
+    }
+
+    /**
+     * Set the space-separated list of property values.
+     *
+     * @param properties the space-separated list of property values
+     */
+    public void setProperties(final String properties) {
+        this.properties = properties;
     }
 
     /**
@@ -266,26 +289,6 @@ public class Resource implements Serializable {
     }
 
     /**
-     * Gets the hashCode of the Resource's href.
-     *
-     */
-    public int hashCode() {
-        return href.hashCode();
-    }
-
-    /**
-     * Checks to see of the given resourceObject is a resource and whether its href is equal to this one.
-     *
-     * @return whether the given resourceObject is a resource and whether its href is equal to this one.
-     */
-    public boolean equals(Object resourceObject) {
-        if (! (resourceObject instanceof Resource)) {
-            return false;
-        }
-        return href.equals(((Resource) resourceObject).getHref());
-    }
-
-    /**
      * This resource's mediaType.
      *
      * @return This resource's mediaType.
@@ -302,6 +305,7 @@ public class Resource implements Serializable {
         this.title = title;
     }
 
+    @Override
     public String toString() {
         return StringUtil.toString("id", id,
                 "title", title,
@@ -309,5 +313,33 @@ public class Resource implements Serializable {
                 "mediaType", mediaType,
                 "href", href,
                 "size", (data == null ? 0 : data.length));
+    }
+
+    /**
+     * Return whether some other object is equal to this object.
+     *
+     * @param obj the object with which to compare
+     * @return whether the object is equal to this object
+     */
+    @Override
+    public boolean equals(final Object obj) {
+        if (obj == this) {
+            return true;
+        }
+        if (!(obj instanceof Resource)) {
+            return false;
+        }
+        Resource r = (Resource) obj;
+        return getHref() != null ? getHref().equals(r.getHref()) : r.getHref() == null;
+    }
+
+    /**
+     * Return a hash code value for this object.
+     *
+     * @return a hash code value for this object
+     */
+    @Override
+    public int hashCode() {
+        return getHref() != null ? getHref().hashCode() : 0;
     }
 }

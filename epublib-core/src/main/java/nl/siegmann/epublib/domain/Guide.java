@@ -2,6 +2,7 @@ package nl.siegmann.epublib.domain;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -11,36 +12,37 @@ import java.util.List;
  * It is an optional part of an epub, and support for the various types of references varies by reader.
  *
  * The only part of this that is heavily used is the cover page.
- *
- * @author paul
- *
  */
 public class Guide implements Serializable {
 
+    public static final String DEFAULT_COVER_TITLE = GuideReference.COVER;
     /**
-     *
+     * The serial version UID.
      */
     private static final long serialVersionUID = -6256645339915751189L;
 
-    public static final String DEFAULT_COVER_TITLE = GuideReference.COVER;
-
-    private List<GuideReference> references = new ArrayList<GuideReference>();
     private static final int COVERPAGE_NOT_FOUND = -1;
-    private static final int COVERPAGE_UNITIALIZED = -2;
 
-    private int coverPageIndex = -1;
+    private static final int COVERPAGE_UNINITIALISED = -2;
+
+    private final List<GuideReference> references = new ArrayList<>();
+
+    private int coverPageIndex = COVERPAGE_NOT_FOUND;
+
+    public boolean isEmpty() {
+        return references.isEmpty();
+    }
 
     public List<GuideReference> getReferences() {
-        return references;
+        return Collections.unmodifiableList(references);
     }
 
-    public void setReferences(List<GuideReference> references) {
-        this.references = references;
+    public void setReferences(final List<GuideReference> references) {
+        this.references.clear();
+        if (references != null) {
+            this.references.addAll(references);
+        }
         uncheckCoverPage();
-    }
-
-    private void uncheckCoverPage() {
-        coverPageIndex = COVERPAGE_UNITIALIZED;
     }
 
     public GuideReference getCoverReference() {
@@ -59,24 +61,6 @@ public class Guide implements Serializable {
             coverPageIndex = 0;
         }
         return coverPageIndex;
-    }
-
-    private void checkCoverPage() {
-        if (coverPageIndex == COVERPAGE_UNITIALIZED) {
-            initCoverPage();
-        }
-    }
-
-    private void initCoverPage() {
-        int result = COVERPAGE_NOT_FOUND;
-        for (int i = 0; i < references.size(); i++) {
-            GuideReference guideReference = references.get(i);
-            if (guideReference.getType().equals(GuideReference.COVER)) {
-                result = i;
-                break;
-            }
-        }
-        coverPageIndex = result;
     }
 
     /**
@@ -110,12 +94,30 @@ public class Guide implements Serializable {
      * @return A list of all GuideReferences that have the given referenceTypeName (ignoring case).
      */
     public List<GuideReference> getGuideReferencesByType(String referenceTypeName) {
-        List<GuideReference> result = new ArrayList<GuideReference>();
+        List<GuideReference> result = new ArrayList<>();
         for (GuideReference guideReference: references) {
             if (referenceTypeName.equalsIgnoreCase(guideReference.getType())) {
                 result.add(guideReference);
             }
         }
         return result;
+    }
+
+    private void checkCoverPage() {
+        if (coverPageIndex == COVERPAGE_UNINITIALISED) {
+            int result = COVERPAGE_NOT_FOUND;
+            for (int i = 0; i < references.size(); i++) {
+                GuideReference guideReference = references.get(i);
+                if (guideReference.getType().equals(GuideReference.COVER)) {
+                    result = i;
+                    break;
+                }
+            }
+            coverPageIndex = result;
+        }
+    }
+
+    private void uncheckCoverPage() {
+        coverPageIndex = COVERPAGE_UNINITIALISED;
     }
 }

@@ -59,8 +59,8 @@ public final class MediatypeService {
     public static final Map<String, MediaType> MEDIA_TYPES_BY_NAME = new HashMap<>();
 
     static {
-        for (MediaType mediatype : MEDIA_TYPES) {
-            MEDIA_TYPES_BY_NAME.put(mediatype.getName(), mediatype);
+        for (MediaType mediaType : MEDIA_TYPES) {
+            MEDIA_TYPES_BY_NAME.put(mediaType.getName(), mediaType);
         }
     }
 
@@ -79,7 +79,7 @@ public final class MediatypeService {
      * @param filename the name of the file to determine the MediaType of
      * @return the MediaType based on the file extension
      */
-    public static MediaType determineMediaType(final String filename) {
+    public static MediaType getMediaTypeByFilename(final String filename) {
         for (MediaType mediatype : MEDIA_TYPES) {
             for (String extension: mediatype.getExtensions()) {
                 if (StringUtil.endsWithIgnoreCase(filename, extension)) {
@@ -90,7 +90,7 @@ public final class MediatypeService {
         return null;
     }
 
-    public static MediaType getMediaTypeByName(final String mediaTypeName) {
-        return MEDIA_TYPES_BY_NAME.get(mediaTypeName);
+    public static MediaType getMediaTypeByName(final String name) {
+        return MEDIA_TYPES_BY_NAME.get(name);
     }
 }

@@ -1,6 +1,7 @@
 package nl.siegmann.epublib.epub;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import nl.siegmann.epublib.util.StringUtil;
@@ -12,13 +13,78 @@ import org.w3c.dom.NodeList;
 import org.w3c.dom.Text;
 
 /**
- * Utility methods for working with the DOM.
- *
- * @author paul
- *
+ * This class provides utility methods for parsing XML.
  */
-// package
-class DOMUtil {
+final class DOMUtil {
+    /**
+     * Private constructor to prevent instantiation of utility class.
+     */
+    private DOMUtil() {
+        super();
+    }
+
+    /**
+     * Get the first occurrence of an element of a given namespace and element
+     * name that is a descendant of a specific parent element.
+     *
+     * @param parentElement the parent element to get the descendant of
+     * @param namespace the namespace of the element to get
+     * @param element the name of the element to get
+     * @return the first occurrence of the element
+     */
+    public static Element getFirstElement(final Element parentElement, final String namespace, final String element) {
+        NodeList elements = parentElement.getElementsByTagNameNS(namespace, element);
+        return elements.getLength() > 0 ? (Element) elements.item(0) : null;
+    }
+
+    /**
+     * Get the text of all elements of a given namespace and element name that
+     * are descendants of a specific parent element.
+     *
+     * @param parentElement the parent element to get the descendants of
+     * @param namespace the namespace of the elements to get the text of
+     * @param element the name of the elements to get the text of
+     * @return the text
+     */
+    public static List<String> getElementsTextContent(final Element parentElement, final String namespace, final String element) {
+        List<String> text = Collections.emptyList();
+        NodeList elements = parentElement.getElementsByTagNameNS(namespace, element);
+        if (elements.getLength() > 0) {
+            text = new ArrayList<>(elements.getLength());
+            for (int i = 0; i < elements.getLength(); ++i) {
+                text.add(getElementTextContent((Element) elements.item(i)));
+            }
+        }
+        return text;
+    }
+
+    /**
+     * Get the content of all text nodes that are descendants of a specific
+     * node.
+     *
+     * The reason for this more complicated procedure instead of just returning
+     * the data of the firstChild is that when the text is Chinese characters
+     * then on Android each Character is represented in the DOM as an individual
+     * Text node.
+     *
+     * @param node the node to get the content for
+     * @return the text content
+     */
+    public static String getElementTextContent(final Element node) {
+        String text = "";
+        if (node != null) {
+            StringBuilder buf = new StringBuilder();
+            NodeList childNodes = node.getChildNodes();
+            for (int i = 0; i < childNodes.getLength(); ++i) {
+                Node child = childNodes.item(i);
+                if (child != null && child.getNodeType() == Node.TEXT_NODE) {
+                    buf.append(((Text) child).getData());
+                }
+            }
+            text = buf.toString().trim();
+        }
+        return text;
+    }
 
     /**
      * First tries to get the attribute value by doing an getAttributeNS on the element, if that gets an empty element it does a getAttribute without namespace.
@@ -28,27 +94,10 @@ class DOMUtil {
      * @param attribute
      * @return
      */
-    public static String getAttribute(Element element, String namespace, String attribute) {
+    public static String getAttributeValue(Element element, String namespace, String attribute) {
         String result = element.getAttributeNS(namespace, attribute);
         if (StringUtil.isEmpty(result)) {
             result = element.getAttribute(attribute);
-        }
-        return result;
-    }
-
-    /**
-     * Gets all descendant elements of the given parentElement with the given namespace and tagname and returns their text child as a list of String.
-     *
-     * @param parentElement
-     * @param namespace
-     * @param tagname
-     * @return
-     */
-    public static List<String> getElementsTextChild(Element parentElement, String namespace, String tagname) {
-        NodeList elements = parentElement.getElementsByTagNameNS(namespace, tagname);
-        List<String> result = new ArrayList<String>(elements.getLength());
-        for(int i = 0; i < elements.getLength(); i++) {
-            result.add(getTextChildrenContent((Element) elements.item(i)));
         }
         return result;
     }
@@ -65,7 +114,7 @@ class DOMUtil {
      * @param resultAttributeName
      * @return
      */
-    public static String getFindAttributeValue(Document document, String namespace, String elementName, String findAttributeName, String findAttributeValue, String resultAttributeName) {
+    public static String getAttributeValue(Document document, String namespace, String elementName, String findAttributeName, String findAttributeValue, String resultAttributeName) {
         NodeList metaTags = document.getElementsByTagNameNS(namespace, elementName);
         for(int i = 0; i < metaTags.getLength(); i++) {
             Element metaElement = (Element) metaTags.item(i);
@@ -76,49 +125,4 @@ class DOMUtil {
         }
         return null;
     }
-
-    /**
-     * Gets the first element that is a child of the parentElement and has the given namespace and tagName
-     *
-     * @param parentElement
-     * @param namespace
-     * @param tagName
-     * @return
-     */
-    public static Element getFirstElementByTagNameNS(Element parentElement, String namespace, String tagName) {
-        NodeList nodes = parentElement.getElementsByTagNameNS(namespace, tagName);
-        if(nodes.getLength() == 0) {
-            return null;
-        }
-        return (Element) nodes.item(0);
-    }
-
-    /**
-     * The contents of all Text nodes that are children of the given parentElement.
-     * The result is trim()-ed.
-     *
-     * The reason for this more complicated procedure instead of just returning the data of the firstChild is that
-     * when the text is Chinese characters then on Android each Characater is represented in the DOM as
-     * an individual Text node.
-     *
-     * @param parentElement
-     * @return
-     */
-    public static String getTextChildrenContent(Element parentElement) {
-        if(parentElement == null) {
-            return null;
-        }
-        StringBuilder result = new StringBuilder();
-        NodeList childNodes = parentElement.getChildNodes();
-        for (int i = 0; i < childNodes.getLength(); i++) {
-            Node node = childNodes.item(i);
-            if ((node == null) ||
-                    (node.getNodeType() != Node.TEXT_NODE)) {
-                continue;
-            }
-            result.append(((Text) node).getData());
-        }
-        return result.toString().trim();
-    }
-
 }

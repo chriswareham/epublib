@@ -12,11 +12,9 @@ import java.util.List;
  * functions are fairly simple and using my own implementation saves the
  * inclusion of a 200Kb jar file.
  *
- * @author paul.siegmann
- *
+ * @author Paul Siegmann
  */
-public class StringUtil {
-
+public final class StringUtil {
     /**
      * Changes a path containing '..', '.' and empty dirs into a path that
      * doesn't. X/foo/../Y is changed into 'X/Y', etc. Does not handle invalid
@@ -27,7 +25,7 @@ public class StringUtil {
      */
     public static String collapsePathDots(String path) {
         String[] stringParts = path.split("/");
-        List<String> parts = new ArrayList<String>(Arrays.asList(stringParts));
+        List<String> parts = new ArrayList<>(Arrays.asList(stringParts));
         for (int i = 0; i < parts.size() - 1; i++) {
             String currentDir = parts.get(i);
             if (currentDir.length() == 0 || currentDir.equals(".")) {
@@ -137,59 +135,6 @@ public class StringUtil {
     }
 
     /**
-     * Null-safe string comparator
-     *
-     * @param text1
-     * @param text2
-     * @return whether the two strings are equal
-     */
-    public static boolean equals(String text1, String text2) {
-        if (text1 == null) {
-            return (text2 == null);
-        }
-        return text1.equals(text2);
-    }
-
-    /**
-     * Pretty toString printer.
-     *
-     * @param keyValues
-     * @return a string representation of the input values
-     */
-    public static String toString(Object... keyValues) {
-        StringBuilder result = new StringBuilder();
-        result.append('[');
-        for (int i = 0; i < keyValues.length; i += 2) {
-            if (i > 0) {
-                result.append(", ");
-            }
-            result.append(keyValues[i]);
-            result.append(": ");
-            Object value = null;
-            if ((i + 1) < keyValues.length) {
-                value = keyValues[i + 1];
-            }
-            if (value == null) {
-                result.append("<null>");
-            } else {
-                result.append('\'');
-                result.append(value);
-                result.append('\'');
-            }
-        }
-        result.append(']');
-        return result.toString();
-    }
-
-    public static int hashCode(String... values) {
-        int result = 31;
-        for (int i = 0; i < values.length; i++) {
-            result ^= String.valueOf(values[i]).hashCode();
-        }
-        return result;
-    }
-
-    /**
      * Gives the substring of the given text before the given separator.
      *
      * If the text does not contain the given separator then the given text is
@@ -273,6 +218,66 @@ public class StringUtil {
         return text.substring(cPos + 1);
     }
 
+    /**
+     * Pretty print one or more name-value pairs of strings.
+     *
+     * @param strPairs the name-value pairs of strings
+     * @return a string representation of the name-value pairs of strings
+     */
+    public static String toString(final Object... strPairs) {
+        StringBuilder buf = new StringBuilder();
+        buf.append('[');
+        for (int i = 0; i < strPairs.length; i += 2) {
+            if (i > 0) {
+                buf.append(", ");
+            }
+            buf.append(strPairs[i]);
+            buf.append(": ");
+            Object str = null;
+            if ((i + 1) < strPairs.length) {
+                str = strPairs[i + 1];
+            }
+            if (str == null) {
+                buf.append("<null>");
+            } else {
+                buf.append('\'');
+                buf.append(str);
+                buf.append('\'');
+            }
+        }
+        buf.append(']');
+        return buf.toString();
+    }
+
+    /**
+     * Compare two strings for equality.
+     *
+     * @param str1 the first string to compare
+     * @param str2 the second string to compare
+     * @return whether the strings are equal
+     */
+    public static boolean equals(final String str1, final String str2) {
+        return str1 == null ? str2 == null : str1.equals(str2);
+    }
+
+    /**
+     * Generate a hash code for one or more strings.
+     *
+     * @param strs the strings to generate a hash code for
+     * @return the hash code for the strings
+     */
+    public static int hashCode(final String... strs) {
+        int result = 31;
+        for (String str : strs) {
+            result ^= String.valueOf(str).hashCode();
+        }
+        return result;
+    }
+
+    /**
+     * Private constructor to prevent instantiation of utility class.
+     */
     private StringUtil() {
+        super();
     }
 }

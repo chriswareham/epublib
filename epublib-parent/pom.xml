@@ -5,8 +5,8 @@
 
     <modelVersion>4.0.0</modelVersion>
 
-    <name>epublib-parent</name>
-    <description>A java library for reading/writing/manipulating epub files</description>
+    <name>EPUBlib Parent</name>
+    <description>A Java library for reading/writing/manipulating EPUB files</description>
     <url>http://www.siegmann.nl/epublib</url>
     <inceptionYear>2009</inceptionYear>
 
